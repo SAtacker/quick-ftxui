@@ -1,6 +1,9 @@
 Quick-FTXUI
 -------------
 
+[![Linux Build](https://github.com/SAtacker/quick-ftxui/actions/workflows/linux_build.yml/badge.svg)](https://github.com/SAtacker/quick-ftxui/actions/workflows/linux_build.yml)
+[![Windows Build](https://github.com/SAtacker/quick-ftxui/actions/workflows/windows_build.yml/badge.svg)](https://github.com/SAtacker/quick-ftxui/actions/workflows/windows_build.yml)
+
 
 # Build instructions:
 ~~~bash
