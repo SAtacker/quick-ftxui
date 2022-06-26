@@ -14,10 +14,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    # - name: Install Catch2
-    #   run: |
-    #     vcpkg integrate install
-    #     vcpkg install catch2:x64-windows
+    - name: Install Boost
+      run: |
+        vcpkg integrate install
+        vcpkg install boost:x64-windows
     - name: Configure CMake
       run: cmake -S . -B build "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake"
         

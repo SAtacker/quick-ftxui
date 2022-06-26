@@ -28,7 +28,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Prepare compiler
-      run: sudo apt-get install -y ${{matrix.compiler}}
+      run: sudo apt-get install -y ${{matrix.compiler}} libboost-all-dev
        
     - name: Configure CMake
       run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -37,7 +37,7 @@ jobs:
       run: cmake --build build
 
     - name: Test
-      run: cmake --build build --target test
+      run: cmake --build build -DQUICK_FTXUI_TESTS=ON --target test
 
     - name: Install
       run: cmake --install build --prefix $CMAKE_PREFIX_PATH
