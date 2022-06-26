@@ -1,0 +1,49 @@
+name: Linux Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: ${{matrix.cxx}}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        cxx:
+          - g++-10
+          - clang++-12
+        include:
+          - cxx: g++-10
+            compiler: g++-10
+          - cxx: clang++-12
+            compiler: clang++-12
+    env:
+      CXX: ${{matrix.cxx}}
+      CMAKE_PREFIX_PATH: ${{github.workspace}}/.local
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Prepare compiler
+      run: sudo apt-get install -y ${{matrix.compiler}}
+       
+    - name: Configure CMake
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: cmake --build build
+
+    - name: Test
+      run: cmake --build build --target test
+
+    - name: Install
+      run: cmake --install build --prefix $CMAKE_PREFIX_PATH
+
+    # - name: Configure CMake for examples
+    #   run: cmake -S examples -B examples/build -DCMAKE_BUILD_TYPE=Release
+
+    # - name: Build examples
+    #   run: cmake --build examples/build

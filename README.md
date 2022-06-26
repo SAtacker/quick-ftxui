@@ -13,7 +13,7 @@ Minimal starter project using the [FTXUI library](https://github.com/ArthurSonzo
 mkdir build
 cd build
 cmake ..
-make -j3
+make -j
 ./ftxuistarter
 ~~~
 

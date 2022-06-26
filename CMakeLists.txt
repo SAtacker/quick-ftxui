@@ -1,34 +1,56 @@
-cmake_minimum_required (VERSION 3.11)
+cmake_minimum_required(VERSION 3.14)
+project(quick-ftxui
+    LANGUAGES CXX
+    VERSION 0.1.0
+)
+
+find_package(Boost REQUIRED COMPONENTS regex)
+set(CMAKE_CXX_STANDARD_REQUIRED 17)
+set(CMAKE_CXX_STANDARD 17)
 
 # --- Fetch FTXUI --------------------------------------------------------------
 include(FetchContent)
 
 set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE)
 FetchContent_Declare(ftxui
-  GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
-  GIT_TAG v0.11
+    GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
+    GIT_TAG v3.0.0
 )
 
 FetchContent_GetProperties(ftxui)
+
 if(NOT ftxui_POPULATED)
-  FetchContent_Populate(ftxui)
-  add_subdirectory(${ftxui_SOURCE_DIR} ${ftxui_BINARY_DIR} EXCLUDE_FROM_ALL)
+    FetchContent_Populate(ftxui)
+    add_subdirectory(${ftxui_SOURCE_DIR} ${ftxui_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 
 # ------------------------------------------------------------------------------
+if(QUICK_FTXUI_TESTS)
+    FetchContent_Declare(
+        Catch2
+        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+        GIT_TAG v3.0.1 # or a later release
+    )
 
-project(ftxui-starter
-  LANGUAGES CXX
-  VERSION 1.0.0
+    FetchContent_MakeAvailable(Catch2)
+
+    add_executable(tests tests/test1.cpp)
+    target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+    target_include_directories(tests PRIVATE include)
+    include(CTest)
+    include(Catch)
+    catch_discover_tests(tests)
+endif()
+
+add_executable(quick-ftxui src/quick-ftxui.cpp)
+target_include_directories(quick-ftxui PRIVATE include ${Boost_INCLUDE_DIR})
+
+target_link_libraries(quick-ftxui
+    PRIVATE ${Boost_LIBRARIES}
+
+    # PRIVATE ftxui::screen
+    # PRIVATE ftxui::dom
+    # PRIVATE ftxui::component # Not needed for this example.
 )
 
-add_executable(ftxui-starter src/main.cpp)
-target_include_directories(ftxui-starter PRIVATE src)
-
-target_link_libraries(ftxui-starter
-  PRIVATE ftxui::screen
-  PRIVATE ftxui::dom
-  PRIVATE ftxui::component # Not needed for this example.
-)
-
-install(TARGETS ftxui-starter RUNTIME DESTINATION "bin")
+install(TARGETS quick-ftxui RUNTIME DESTINATION "bin")

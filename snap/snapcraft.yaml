@@ -1,20 +1,20 @@
-name: ftxui-starter
-version: '1.0.0'
-summary: A simple starter project for the FTXUI library.
-description: A simple starter project for the FTXUI library.
+name: quick-ftxui
+version: '0.1.0'
+summary: Quick terminal UI with FTXUI backend.
+description: Quick terminal UI with FTXUI backend.
 
 grade: stable
 confinement: strict
 base: core18
 
 apps:
-  ftxui-starter:
-    command: ftxui-starter
+  quick-ftxui:
+    command: quick-ftxui
 
 parts:
-  ftxui-starter:
+  quick-ftxui:
     plugin: cmake
-    source: https://github.com/ArthurSonzogni/ftxui-starter
+    source: https://github.com/SAtacker/quick-ftxui
     source-type: git
     source-depth: 1
     build-snaps: [cmake/latest/edge] # We need cmake >= 3.11
@@ -23,9 +23,9 @@ parts:
         -DCMAKE_INSTALL_PREFIX=$SNAPCRAFT_PART_INSTALL/usr/local \
         -DCMAKE_BUILD_TYPE=Release \
         $SNAPCRAFT_PART_SRC
-      make -j 4
+      make -j
       make install
 
 passthrough:
-  title: ftxui-starter
+  title: quick-ftxui
   license: MIT
