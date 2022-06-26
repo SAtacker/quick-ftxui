@@ -19,10 +19,10 @@ jobs:
         vcpkg integrate install
         vcpkg install boost:x64-windows
     - name: Configure CMake
-      run: cmake -S . -B build "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake"
+      run: cmake -S . -B build --parallel "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake"
         
     - name: Build
-      run: cmake --build build --config Release
+      run: cmake --build build --config Release --parallel
 
     - name: Test
       run: |

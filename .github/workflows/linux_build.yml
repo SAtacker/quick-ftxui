@@ -34,10 +34,10 @@ jobs:
       run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
-      run: cmake --build build
+      run: cmake --build build --parallel
 
     - name: Test
-      run: cmake --build build -DQUICK_FTXUI_TESTS=ON --target test
+      run: pushd build && cmake .. -DQUICK_FTXUI_TESTS=ON && cmake --build . --parallel && ctest -C Release && popd
 
     - name: Install
       run: cmake --install build --prefix $CMAKE_PREFIX_PATH
