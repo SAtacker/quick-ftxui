@@ -17,7 +17,8 @@ jobs:
     - name: Install Boost
       run: |
         vcpkg integrate install
-        vcpkg install boost:x64-windows
+        vcpkg install boost-spirit --triplet x64-windows
+        vcpkg install boost-regex --triplet x64-windows
     - name: Configure CMake
       run: cmake -S . -B build "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake"
         
