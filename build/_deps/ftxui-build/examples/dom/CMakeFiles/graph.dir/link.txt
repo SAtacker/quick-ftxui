@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/graph.dir/graph.cpp.o  -o graph  ../../ftxui-dom.a ../../ftxui-screen.a 

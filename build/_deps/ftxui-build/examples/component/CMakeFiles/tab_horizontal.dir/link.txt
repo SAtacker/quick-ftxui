@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/tab_horizontal.dir/tab_horizontal.cpp.o  -o tab_horizontal  ../../ftxui-component.a ../../ftxui-dom.a ../../ftxui-screen.a -lpthread 

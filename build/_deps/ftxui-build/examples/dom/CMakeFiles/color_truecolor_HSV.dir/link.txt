@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/color_truecolor_HSV.dir/color_truecolor_HSV.cpp.o  -o color_truecolor_HSV  ../../ftxui-dom.a ../../ftxui-screen.a 

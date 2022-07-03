@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/color_gallery.dir/color_gallery.cpp.o  -o color_gallery  ../../ftxui-dom.a ../../ftxui-screen.a 

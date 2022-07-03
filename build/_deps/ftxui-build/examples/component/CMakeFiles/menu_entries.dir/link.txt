@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/menu_entries.dir/menu_entries.cpp.o  -o menu_entries  ../../ftxui-component.a ../../ftxui-dom.a ../../ftxui-screen.a -lpthread 

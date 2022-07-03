@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/radiobox_in_frame.dir/radiobox_in_frame.cpp.o  -o radiobox_in_frame  ../../ftxui-component.a ../../ftxui-dom.a ../../ftxui-screen.a -lpthread 

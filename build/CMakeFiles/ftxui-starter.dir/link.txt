@@ -1,0 +1,1 @@
+/usr/bin/c++       -o ftxui-starter  _deps/ftxui-build/ftxui-screen.a _deps/ftxui-build/ftxui-dom.a _deps/ftxui-build/ftxui-component.a _deps/ftxui-build/ftxui-dom.a _deps/ftxui-build/ftxui-screen.a -lpthread 

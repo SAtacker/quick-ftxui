@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/spinner.dir/spinner.cpp.o  -o spinner  ../../ftxui-dom.a ../../ftxui-screen.a 

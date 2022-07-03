@@ -1,0 +1,3 @@
+repository='https://github.com/ArthurSonzogni/ftxui'
+module=''
+tag='origin'

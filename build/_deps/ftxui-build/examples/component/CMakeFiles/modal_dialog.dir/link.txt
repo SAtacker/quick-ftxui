@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/modal_dialog.dir/modal_dialog.cpp.o  -o modal_dialog  ../../ftxui-component.a ../../ftxui-dom.a ../../ftxui-screen.a -lpthread 

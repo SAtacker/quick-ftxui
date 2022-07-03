@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/window.dir/window.cpp.o  -o window  ../../ftxui-dom.a ../../ftxui-screen.a 

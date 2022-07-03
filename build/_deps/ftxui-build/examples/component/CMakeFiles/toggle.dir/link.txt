@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/toggle.dir/toggle.cpp.o  -o toggle  ../../ftxui-component.a ../../ftxui-dom.a ../../ftxui-screen.a -lpthread 

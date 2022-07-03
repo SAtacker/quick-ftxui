@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/menu_in_frame.dir/menu_in_frame.cpp.o  -o menu_in_frame  ../../ftxui-component.a ../../ftxui-dom.a ../../ftxui-screen.a -lpthread 
