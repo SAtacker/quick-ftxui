@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/vbox_hbox.dir/vbox_hbox.cpp.o  -o vbox_hbox  ../../ftxui-dom.a ../../ftxui-screen.a 

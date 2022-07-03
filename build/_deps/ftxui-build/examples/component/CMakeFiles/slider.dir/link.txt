@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/slider.dir/slider.cpp.o  -o slider  ../../ftxui-component.a ../../ftxui-dom.a ../../ftxui-screen.a -lpthread 

@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/input.dir/input.cpp.o  -o input  ../../ftxui-component.a ../../ftxui-dom.a ../../ftxui-screen.a -lpthread 

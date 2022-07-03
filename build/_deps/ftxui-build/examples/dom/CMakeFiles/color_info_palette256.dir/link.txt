@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/color_info_palette256.dir/color_info_palette256.cpp.o  -o color_info_palette256  ../../ftxui-dom.a ../../ftxui-screen.a 

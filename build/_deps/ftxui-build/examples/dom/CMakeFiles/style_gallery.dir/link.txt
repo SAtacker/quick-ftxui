@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/style_gallery.dir/style_gallery.cpp.o  -o style_gallery  ../../ftxui-dom.a ../../ftxui-screen.a 

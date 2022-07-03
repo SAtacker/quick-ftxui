@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/gridbox.dir/gridbox.cpp.o  -o gridbox  ../../ftxui-dom.a ../../ftxui-screen.a 

@@ -1,1 +1,0 @@
-/usr/bin/cc -O3 -DNDEBUG   CMakeFiles/quick-ftuxi.dir/src/ast.c.o CMakeFiles/quick-ftuxi.dir/src/codeprinter.c.o CMakeFiles/quick-ftuxi.dir/src/lexer.c.o CMakeFiles/quick-ftuxi.dir/src/main.c.o CMakeFiles/quick-ftuxi.dir/src/symbol_table.c.o CMakeFiles/quick-ftuxi.dir/third-party/vec/vec.c.o CMakeFiles/quick-ftuxi.dir/src/parser.c.o  -o ../bin/quick-ftuxi 

@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/size.dir/size.cpp.o  -o size  ../../ftxui-dom.a ../../ftxui-screen.a 

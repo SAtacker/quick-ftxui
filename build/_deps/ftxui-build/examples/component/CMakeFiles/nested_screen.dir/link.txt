@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/nested_screen.dir/nested_screen.cpp.o  -o nested_screen  ../../ftxui-component.a ../../ftxui-dom.a ../../ftxui-screen.a -lpthread 
