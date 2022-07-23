@@ -17,7 +17,14 @@ typedef vec_t(struct ast_node_statements*) ast_nodes_statements;
 struct ast_node;
 struct ast_node_statements;
 struct ast_node_compound_statement;
-struct ast_node_button_compon;
+struct ast_node_button_component;
+struct ast_node_expression;
+
+typedef struct ast_node ast_node;
+typedef struct ast_node_statements ast_node_statements;
+typedef struct ast_node_compound_statement ast_node_compound_statement;
+typedef struct ast_node_button_component ast_node_button_component;
+typedef struct ast_node_expression ast_node_expression;
 
 struct ast_node 
 {
@@ -32,7 +39,7 @@ struct ast_node
     union child_nodes
     {
         ast_node_compound_statement *compound_statement;
-        ast_node_button *button;
+        ast_node_button_component *button;
     }child_nodes;
 };
 
@@ -56,7 +63,7 @@ ast_node *add_program_unit(ast_node *parent, ast_node *child);
 ast_node_statements *create_statement_node(int node_type, void *child);
 ast_node_compound_statement *create_compound_statement_node();
 ast_node_compound_statement *add_compound_statement_node(ast_node_compound_statement *parent, ast_node_statements *child);
-ast_node_button_component *create_button_component_node(sym_ptr symbol, ast_node_expression *exp)
+ast_node_button_component *create_button_component_node(sym_ptr symbol, ast_node_expression *exp);
 void ast_node_dump(ast_node* ast);
 void ast_node_type(int node_type);
 

@@ -61,3 +61,5 @@ bin/
 src/lexer.c
 src/parser.c
 
+.vscode/**
+src/parser.h

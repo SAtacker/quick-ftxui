@@ -1,11 +1,16 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
+#include "symbol_table.h"
+#include "ast.h"
+#include "codeprinter.h"
 
 extern void yyerror(const char* s);
 extern int yylex();
 extern int yyparse();
+extern ast_node *create_translation_unit();
 extern FILE* yyin;
+ast_node *ast = NULL;
 
 extern int linenumber;
 #define YYDEBUG 1
@@ -22,8 +27,8 @@ extern int linenumber;
     struct ast_node_button_component *button_component;
 }
 
-%token button toggle
-%token red green blue
+%token BUTTON TOGGLE
+%token RED GREEN BLUE
 %token LBRACE RBRACE
 %token COMMA SEMICOLON
 
@@ -31,6 +36,7 @@ extern int linenumber;
 %type <statements> statement 
 %type <compound_statement> statement_list compound_statement 
 %type <button_component> button_component
+%type <symbol_handle> BUTTON RED GREEN BLUE
 %start start
 
 %%
@@ -75,15 +81,15 @@ statement: compound_statement {
          }
          ;
 
-button_component: button COMMA red SEMICOLON {
+button_component: BUTTON COMMA RED SEMICOLON {
                     $$ = create_button_component_node($1, $3);
 
                 }     
-                | button COMMA blue SEMICOLON {
+                | BUTTON COMMA BLUE SEMICOLON {
                     $$ = create_button_component_node($1, $3);
 
                 }
-                | button COMMA green SEMICOLON {
+                | BUTTON COMMA GREEN SEMICOLON {
                     $$ = create_button_component_node($1, $3);
 
                 }
@@ -93,5 +99,4 @@ void yyerror (const char *s)
 {
     fprintf (stderr, "%d : error: %s\n", linenumber, s);
     exit(0);
-}
 }

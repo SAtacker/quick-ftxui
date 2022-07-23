@@ -1,5 +1,23 @@
 #include "ast.h"
 
+ast_node *create_translation_unit()
+{
+    ast_node *tu = (ast_node*)malloc(sizeof(ast_node));
+
+    tu->node_type = AST_NODE_TRANSLATIONAL_UNIT;
+    vec_init(&tu->child_nodes);
+
+    return tu;
+}
+
+ast_node *add_program_unit(ast_node *parent, ast_node *child)
+{
+    vec_push(&parent->child_nodes, child);
+
+    return parent;
+}
+
+
 ast_node_statements *create_statement_node(int node_type, void *child)
 {
     ast_node_statements *stmt = (ast_node_statements*)malloc(sizeof(ast_node_statements));
@@ -12,7 +30,7 @@ ast_node_statements *create_statement_node(int node_type, void *child)
             break;
 
         case AST_NODE_BUTTON:
-            stmt->child_nodes.button_component = child;
+            stmt->child_nodes.button = child;
             break;
 
     }
@@ -37,7 +55,7 @@ ast_node_compound_statement *add_compound_statement_node(ast_node_compound_state
 
 ast_node_button_component *create_button_component_node(sym_ptr symbol, ast_node_expression *exp)
 {
-    ast_node_component_button *component_button = (ast_node_button_component*)malloc(sizeof(ast_node_button_component));
+    ast_node_button_component *component_button = (ast_node_button_component*)malloc(sizeof(ast_node_button_component));
 
     component_button->node_type = AST_NODE_BUTTON;
     component_button->expression = exp;

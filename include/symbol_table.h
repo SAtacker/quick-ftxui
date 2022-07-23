@@ -3,7 +3,6 @@
 
 #include "klib/khash.h"
 #include "vec/vec.h"
-#include "pin_config.h"
 
 typedef vec_t(struct symbol*) param;
 typedef struct symbol
@@ -16,6 +15,7 @@ typedef struct symbol
     int is_function;
     int is_constant;
     param params;
+    int data_type;
 }*sym_ptr, sym;
 
 KHASH_MAP_INIT_STR(symbol_table, sym_ptr);

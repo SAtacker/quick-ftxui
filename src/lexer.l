@@ -1,10 +1,14 @@
 %{
   #include <stdio.h>
+  #include "parser.h"
   int linenumber = 1;
 
   void yyerror(char* s);
   int yylex();
 %}
+
+%option noyywrap
+%x comment
 
 whitespace           (\t|" "|\r)
 parenthesis          ("{"|"}")
@@ -25,14 +29,14 @@ newline              (\n)
   }
 }
 
-{components }           {
+{components}           {
    if (!strcmp(yytext, "Button"))
   {
-    return button ;
+    return BUTTON ;
   }   
     if (!strcmp(yytext, "Toggle"))
   {
-    return toggle ;
+    return TOGGLE ;
   }  
 
 }
@@ -40,15 +44,15 @@ newline              (\n)
 {colors}                {
    if (!strcmp(yytext, "color:blue"))
   {
-    return blue;
+    return BLUE;
   } 
-    if (!strcmp(yytext, "color:red))
+    if (!strcmp(yytext, "color:red"))
   {
-    return red;
+    return RED;
   }
     if (!strcmp(yytext, "color:green"))
   {
-    return green;
+    return GREEN;
   } 
 }
 

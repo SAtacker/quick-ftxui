@@ -15,32 +15,30 @@ void ast_compound_statement_printer(ast_node_compound_statement *cmpd_stmt, FILE
                 break;
 
             case AST_NODE_BUTTON:
-                ast_button_printer(((ast_node_statements*)temp)->child_nodes.button_component, handle, 0);
-                break
+                ast_button_printer(((ast_node_statements*)temp)->child_nodes.button, handle);
+                break;
 
         }
     }
     fprintf(handle, "%s", "}\n");
 }
 
-void ast_button_printer(ast_node_button *button, FILE* handle)
+void ast_button_printer(ast_node_button_component *button, FILE* handle)
 {
  if (button!= NULL && handle != NULL)
     {
-        fprintf(handle, "\t  auto buttons = Container::Horizontal({
-      Button("Hello", [&] { value--; }, ButtonOption::Animated(Color::%s),", assg->symbol_entry->identifier);
-        
-        fprintf(handle,"\t  auto component = Renderer(buttons, [&] {
-    return vbox({
-        vbox({
-            text("value = " + std::to_string(value)),
-            separator(),
-            gauge(value * 0.01f),
-        }) | border,
-        buttons->Render(),
-    });
-  });")
+        fprintf(handle, "\t  auto buttons = Container::Horizontal({Button(\"Hello\", [&] { value--; }, ButtonOption::Animated(Color::%s),", button->symbol_entry->identifier);
 
+        fprintf(handle, "\t  auto component = Renderer(buttons, [&] {"
+                        "return vbox({"
+                        "vbox({"
+                        "text(\"value = \" + std::to_string(value)),"
+                        " separator(),"
+                        "gauge(value * 0.01f),"
+                        " }) | border,"
+                        " buttons->Render(),"
+                        "});"
+                        "});");
     }
     
 }
@@ -57,8 +55,8 @@ int code_printer(ast_node* ast)
 
 
     int i = 0;
-    temp = NULL;
     ast_node *temp;
+    temp = NULL;
 
     fprintf(handle, "%s", BEGIN);
     fprintf(handle, "%s", MAIN);    
@@ -72,7 +70,7 @@ int code_printer(ast_node* ast)
                 break;
 
             case AST_NODE_BUTTON:
-                ast_button_printer(((ast_node_statements*)temp)->child_nodes.button, handle, 0);
+                ast_button_printer(((ast_node_statements*)temp)->child_nodes.button, handle);
                 break;
         }
     }
