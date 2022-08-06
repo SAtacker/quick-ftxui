@@ -21,22 +21,22 @@ extern int linenumber;
 
 %union{
     struct symbol* symbol_handle;
+    char* color_type;
     struct ast_node *node;
     struct ast_node_statements *statements;
     struct ast_node_compound_statement *compound_statement;
     struct ast_node_button_component *button_component;
 }
 
-%token BUTTON TOGGLE
-%token RED GREEN BLUE
-%token LBRACE RBRACE
+%left LBRACE RBRACE
 %token COMMA SEMICOLON
+%token <symbol_handle> BUTTON TOGGLE
+%token <color_type> RED GREEN BLUE
 
 %type <node> translation_unit program
 %type <statements> statement 
 %type <compound_statement> statement_list compound_statement 
 %type <button_component> button_component
-%type <symbol_handle> BUTTON RED GREEN BLUE
 %start start
 
 %%
@@ -73,30 +73,24 @@ statement_list: statement {
               }
               ;
 
-statement: compound_statement {
+statement:button_component {
+            $$ = create_statement_node(AST_NODE_BUTTON, (void*)$1);
+         } 
+         | compound_statement {
             $$ = create_statement_node(AST_NODE_COMPOUND_STATEMENT, (void*)$1);
-         }
-         | button_component {
-            $$ = create_statement_node(AST_NODE_BUTTON, (void*)$1); 
          }
          ;
 
 button_component: BUTTON COMMA RED SEMICOLON {
-                    $$ = create_button_component_node($1, $3);
-
+                    $$ = create_button_component_node("color:red");
                 }     
                 | BUTTON COMMA BLUE SEMICOLON {
-                    $$ = create_button_component_node($1, $3);
+                    $$ = create_button_component_node("color:blue");
 
                 }
                 | BUTTON COMMA GREEN SEMICOLON {
-                    $$ = create_button_component_node($1, $3);
+                    $$ = create_button_component_node( "color:green");
 
                 }
                 ; 
 %%
-void yyerror (const char *s) 
-{
-    fprintf (stderr, "%d : error: %s\n", linenumber, s);
-    exit(0);
-}

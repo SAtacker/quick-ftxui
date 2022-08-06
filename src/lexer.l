@@ -3,7 +3,7 @@
   #include "parser.h"
   int linenumber = 1;
 
-  void yyerror(char* s);
+  void yyerror(const char* s);
   int yylex();
 %}
 
@@ -15,6 +15,7 @@ parenthesis          ("{"|"}")
 components           ("Button"|"Toggle")
 colors               ("color:blue"|"color:red"|"color:green")
 comma                ([,])
+terminal              ([;])
 newline              (\n)
 %%
 
@@ -59,6 +60,10 @@ newline              (\n)
 
 {comma}                 {
   return COMMA;
+}
+
+{terminal}            {
+  return SEMICOLON;
 }
 
 <comment>\n     { linenumber++; }

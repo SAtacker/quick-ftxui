@@ -53,17 +53,16 @@ struct ast_node
  struct ast_node_button_component
 {
     int node_type;
-    
-    sym_ptr symbol_entry;
-    ast_node_expression *expression;
+
+    char *expression;
 };
 
 ast_node *create_translation_unit();
 ast_node *add_program_unit(ast_node *parent, ast_node *child);
 ast_node_statements *create_statement_node(int node_type, void *child);
 ast_node_compound_statement *create_compound_statement_node();
-ast_node_compound_statement *add_compound_statement_node(ast_node_compound_statement *parent, ast_node_statements *child);
-ast_node_button_component *create_button_component_node(sym_ptr symbol, ast_node_expression *exp);
+ast_node_compound_statement *add_compound_statement_node(ast_node_compound_statement *parent, void *child);
+ast_node_button_component *create_button_component_node(char *exp);
 void ast_node_dump(ast_node* ast);
 void ast_node_type(int node_type);
 

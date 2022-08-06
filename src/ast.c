@@ -46,20 +46,19 @@ ast_node_compound_statement *create_compound_statement_node()
     return cmpd_stmt;
 }
 
-ast_node_compound_statement *add_compound_statement_node(ast_node_compound_statement *parent, ast_node_statements *child)
+ast_node_compound_statement *add_compound_statement_node(ast_node_compound_statement *parent, void * child)
 {
     vec_push(&parent->child_nodes, child);
 
     return parent;
 }
 
-ast_node_button_component *create_button_component_node(sym_ptr symbol, ast_node_expression *exp)
+ast_node_button_component *create_button_component_node(char * exp)
 {
     ast_node_button_component *component_button = (ast_node_button_component*)malloc(sizeof(ast_node_button_component));
 
     component_button->node_type = AST_NODE_BUTTON;
     component_button->expression = exp;
-    component_button->symbol_entry = symbol;
 
     return component_button;
 }

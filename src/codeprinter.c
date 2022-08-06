@@ -27,7 +27,7 @@ void ast_button_printer(ast_node_button_component *button, FILE* handle)
 {
  if (button!= NULL && handle != NULL)
     {
-        fprintf(handle, "\t  auto buttons = Container::Horizontal({Button(\"Hello\", [&] { value--; }, ButtonOption::Animated(Color::%s),", button->symbol_entry->identifier);
+        fprintf(handle, "\t  auto buttons = Container::Horizontal({Button(\"Hello\", [&] { value--; }, ButtonOption::Animated(Color::%s),", button->expression);
 
         fprintf(handle, "\t  auto component = Renderer(buttons, [&] {"
                         "return vbox({"
