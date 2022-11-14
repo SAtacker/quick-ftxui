@@ -1,7 +1,6 @@
 #ifndef QUICK_FTXUI_HPP
 #define QUICK_FTXUI_HPP
 
-#include <boost/foreach.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/phoenix/function.hpp>
 #include <boost/spirit/include/qi.hpp>
