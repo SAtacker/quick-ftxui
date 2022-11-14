@@ -16,3 +16,35 @@ ninja
 
 ## Linux snap build:
 Upload your game to github and visit https://snapcraft.io/build.
+
+## Status
+
+It can parse the following code
+```
+{
+    Button{
+        "arg1",
+        "arg2"
+    }
+}
+```
+
+## How it should look like
+
+- `Button`, `Exit` are identifiers
+- `Button` is a `component` type
+- `|` is a `decorator` operator
+- `Blue` is a decorator
+- The operation `plain | decorator` returns `nice` type
+- `render` is like a main function, just render the component
+
+Grammar
+```
+nice -> plain | (nice >> decorator_op >> decorator)
+
+```
+
+```
+my_component = Button("Nothing",Exit) | Blue
+render my_component
+```
