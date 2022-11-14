@@ -45,7 +45,7 @@ inline std::ostream &operator<<(std::ostream &out, nil) {
 
 // print function for debugging
 inline std::ostream &operator<<(std::ostream &out, button b) {
-    out << "Button placeholder: " << b.placeholder << "Button func: " << b.func;
+    out << "Placeholder: " << b.placeholder << " | Func: " << b.func;
     return out;
 }
 
@@ -70,9 +70,59 @@ namespace client {
 namespace qi = boost::spirit::qi;
 namespace ascii = boost::spirit::ascii;
 
-
 namespace quick_ftxui_parser {
 using boost::phoenix::function;
+
+int const tabsize = 4;
+
+void tab(int indent) {
+    for (int i = 0; i < indent; ++i)
+        std::cout << ' ';
+}
+
+struct ast_printer {
+    ast_printer(int indent = 0) : indent(indent) {}
+
+    void operator()(quick_ftxui_ast::expression const &) const;
+
+    int indent;
+};
+
+struct node_printer : boost::static_visitor<> {
+    node_printer(int indent = 0) : indent(indent) {}
+
+    void operator()(client::quick_ftxui_ast::expression const &expr) const {
+        ast_printer(indent + tabsize)(expr);
+    }
+
+    void operator()(quick_ftxui_ast::button const &text) const {
+        tab(indent + tabsize);
+        std::cout << "button: " << text << std::endl;
+    }
+
+    void operator()(quick_ftxui_ast::nil const &text) const {
+        tab(indent + tabsize);
+        std::cout << "nil: \"" << text << '"' << std::endl;
+    }
+
+    int indent;
+};
+
+void ast_printer::operator()(
+    client::quick_ftxui_ast::expression const &expr) const {
+    tab(indent);
+    std::cout << "tag: "
+              << "Button" << std::endl;
+    std::cout << '{' << std::endl;
+    node_printer(indent).operator()(expr.first);
+
+    for (quick_ftxui_ast::node const &node : expr.rest) {
+        boost::apply_visitor(node_printer(indent), node);
+    }
+
+    tab(indent);
+    std::cout << '}' << std::endl;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 //  The error handler

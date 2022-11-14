@@ -42,6 +42,8 @@ int main(int argc, char **argv) {
         std::cout << "-------------------------\n";
         std::cout << "Parsing succeeded\n";
         std::cout << source_code << " Parses OK: " << std::endl;
+        client::quick_ftxui_parser::ast_printer p;
+        p(expression);
     } else {
         std::cout << "-------------------------\n";
         std::cout << "Parsing failed\n";

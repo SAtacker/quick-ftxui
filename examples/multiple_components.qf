@@ -4,11 +4,11 @@
         "arg2"
     }
     Button{
-        "arg1",
-        "arg2"
+        "arg3",
+        "arg4"
     }
     Button{
-        "arg1",
-        "arg2"
+        "arg5",
+        "arg6"
     }
 }
