@@ -7,6 +7,7 @@ project(quick-ftxui
 find_package(Boost REQUIRED COMPONENTS regex)
 set(CMAKE_CXX_STANDARD_REQUIRED 17)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_BUILD_TYPE Debug)
 
 # --- Fetch FTXUI --------------------------------------------------------------
 include(FetchContent)
@@ -35,7 +36,12 @@ if(QUICK_FTXUI_TESTS)
     FetchContent_MakeAvailable(Catch2)
 
     add_executable(tests tests/test1.cpp)
-    target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+    target_link_libraries(tests 
+        PRIVATE Catch2::Catch2WithMain
+        PRIVATE ftxui::screen
+        PRIVATE ftxui::dom
+        PRIVATE ftxui::component
+    )
     target_include_directories(tests PRIVATE include)
     include(CTest)
     include(Catch)
@@ -43,14 +49,20 @@ if(QUICK_FTXUI_TESTS)
 endif()
 
 add_executable(quick-ftxui src/quick-ftxui.cpp)
-target_include_directories(quick-ftxui PRIVATE include ${Boost_INCLUDE_DIR})
+target_include_directories(quick-ftxui 
+    PRIVATE include 
+    PRIVATE ${Boost_INCLUDE_DIR} 
+    PRIVATE ${ftxui_SOURCE_DIR}
+)
 
 target_link_libraries(quick-ftxui
     PRIVATE ${Boost_LIBRARIES}
-
-    # PRIVATE ftxui::screen
-    # PRIVATE ftxui::dom
-    # PRIVATE ftxui::component # Not needed for this example.
+    PRIVATE ftxui::screen
+    PRIVATE ftxui::dom
+    PRIVATE ftxui::component # Not needed for this example.
 )
+
+target_compile_options(quick-ftxui PRIVATE -fsanitize=address)
+target_link_options(quick-ftxui PRIVATE -fsanitize=address)
 
 install(TARGETS quick-ftxui RUNTIME DESTINATION "bin")

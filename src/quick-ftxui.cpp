@@ -42,8 +42,17 @@ int main(int argc, char **argv) {
         std::cout << "-------------------------\n";
         std::cout << "Parsing succeeded\n";
         std::cout << source_code << " Parses OK: " << std::endl;
-        client::quick_ftxui_parser::ast_printer p;
-        p(expression);
+        auto screen = ftxui::ScreenInteractive::Fullscreen();
+        client::quick_ftxui_parser::component_meta_data data{&screen, {}};
+        client::quick_ftxui_parser::ast_printer printer(&data, 0);
+        printer(expression);
+        if (data.components.size()) {
+            auto component =
+                ftxui::Container::Vertical(std::move(data.components));
+            auto main_renderer = ftxui::Renderer(
+                component, [&] { return ftxui::vbox({component->Render()}); });
+            screen.Loop(main_renderer);
+        }
     } else {
         std::cout << "-------------------------\n";
         std::cout << "Parsing failed\n";

@@ -11,4 +11,9 @@
         "arg5",
         "arg6"
     }
+    Input{
+        "arg6",
+        "arg7",
+        "arg8"
+    }
 }

@@ -7,6 +7,15 @@
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/recursive_variant.hpp>
 
+#include "ftxui/component/component.hpp"      // for Input, Renderer, Vertical
+#include "ftxui/component/component_base.hpp" // for ComponentBase
+#include "ftxui/component/component_options.hpp" // for InputOption
+#include "ftxui/component/mouse.hpp"             // for ftxui
+#include "ftxui/component/screen_interactive.hpp"
+#include "ftxui/dom/elements.hpp" // for text, hbox, separator, Element, operator|, vbox, border
+#include "ftxui/screen/screen.hpp"
+#include "ftxui/util/ref.hpp" // for Ref
+
 #include <iostream>
 #include <string>
 
@@ -21,15 +30,22 @@ namespace quick_ftxui_ast {
 struct nil {};
 struct button;
 struct expression;
-// struct function;
+struct input;
 
 typedef boost::variant<nil, boost::recursive_wrapper<button>,
+                       boost::recursive_wrapper<input>,
                        boost::recursive_wrapper<expression>>
     node;
 
 struct button {
     std::string placeholder;
     std::string func;
+};
+
+struct input {
+    std::string placeholder;
+    std::string temp;
+    std::string option;
 };
 
 struct expression {
@@ -49,6 +65,13 @@ inline std::ostream &operator<<(std::ostream &out, button b) {
     return out;
 }
 
+// print function for debugging
+inline std::ostream &operator<<(std::ostream &out, input b) {
+    out << "Placeholder: " << b.placeholder << " | Temp: " << b.temp
+        << " | Options: " << b.option;
+    return out;
+}
+
 } // namespace quick_ftxui_ast
 } // namespace client
 
@@ -58,6 +81,11 @@ BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::button,
                           (std::string, func)
 )
 
+BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::input,
+                          (std::string, placeholder)
+                          (std::string, temp)
+                          (std::string, option)
+)
 
 BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::expression,
                           (client::quick_ftxui_ast::button, first)
@@ -80,24 +108,43 @@ void tab(int indent) {
         std::cout << ' ';
 }
 
+struct component_meta_data {
+    ftxui::ScreenInteractive *screen;
+    ftxui::Components components;
+};
+
 struct ast_printer {
-    ast_printer(int indent = 0) : indent(indent) {}
+    ast_printer(component_meta_data *data_, int indent = 0)
+        : indent(indent), data(data_) {}
+    ast_printer(component_meta_data *data_) : data(data_) {}
 
     void operator()(quick_ftxui_ast::expression const &) const;
 
     int indent;
+
+    component_meta_data *data;
 };
 
 struct node_printer : boost::static_visitor<> {
-    node_printer(int indent = 0) : indent(indent) {}
+    node_printer(component_meta_data *data_, int indent = 0)
+        : indent(indent), data(data_) {}
 
     void operator()(client::quick_ftxui_ast::expression const &expr) const {
-        ast_printer(indent + tabsize)(expr);
+        ast_printer(data, indent + tabsize)(expr);
     }
 
     void operator()(quick_ftxui_ast::button const &text) const {
         tab(indent + tabsize);
         std::cout << "button: " << text << std::endl;
+        if (text.func == "Exit") {
+            data->components.push_back(ftxui::Button(
+                text.placeholder, data->screen->ExitLoopClosure()));
+        }
+    }
+
+    void operator()(quick_ftxui_ast::input const &text) const {
+        tab(indent + tabsize);
+        std::cout << "input: " << text << std::endl;
     }
 
     void operator()(quick_ftxui_ast::nil const &text) const {
@@ -106,18 +153,19 @@ struct node_printer : boost::static_visitor<> {
     }
 
     int indent;
+    component_meta_data *data;
 };
 
 void ast_printer::operator()(
     client::quick_ftxui_ast::expression const &expr) const {
     tab(indent);
     std::cout << "tag: "
-              << "Button" << std::endl;
+              << "Node" << std::endl;
     std::cout << '{' << std::endl;
-    node_printer(indent).operator()(expr.first);
+    node_printer(data, indent).operator()(expr.first);
 
     for (quick_ftxui_ast::node const &node : expr.rest) {
-        boost::apply_visitor(node_printer(indent), node);
+        boost::apply_visitor(node_printer(data, indent), node);
     }
 
     tab(indent);
@@ -162,7 +210,10 @@ struct parser
         button_comp %= qi::lit("Button") >> '{' >> quoted_string >> ',' >>
                        quoted_string >> '}';
 
-        node = button_comp | expression;
+        input_comp %= qi::lit("Input") >> '{' >> quoted_string >> ',' >>
+                      quoted_string >> ',' >> quoted_string >> '}';
+
+        node = button_comp | input_comp | expression;
 
         expression = '{' >> button_comp >> *node >> '}';
 
@@ -177,6 +228,7 @@ struct parser
     qi::rule<Iterator, quick_ftxui_ast::node(), ascii::space_type> node;
     qi::rule<Iterator, quick_ftxui_ast::button(), ascii::space_type>
         button_comp;
+    qi::rule<Iterator, quick_ftxui_ast::input(), ascii::space_type> input_comp;
     qi::rule<Iterator, std::string(), ascii::space_type> quoted_string;
 };
 } // namespace quick_ftxui_parser

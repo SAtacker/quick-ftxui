@@ -29,6 +29,8 @@ It can parse the following code
 }
 ```
 
+[![asciicast](https://asciinema.org/a/537702.svg)](https://asciinema.org/a/537702)
+
 ## How it should look like
 
 - `Button`, `Exit` are identifiers
