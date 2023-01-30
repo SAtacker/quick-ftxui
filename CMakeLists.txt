@@ -5,8 +5,8 @@ project(quick-ftxui
 )
 
 find_package(Boost REQUIRED COMPONENTS regex)
-set(CMAKE_CXX_STANDARD_REQUIRED 17)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED 20)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_BUILD_TYPE Debug)
 
 # --- Fetch FTXUI --------------------------------------------------------------
