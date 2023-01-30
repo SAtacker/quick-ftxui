@@ -16,6 +16,11 @@
 #include "ftxui/screen/screen.hpp"
 #include "ftxui/util/ref.hpp" // for Ref
 
+// Cling
+#include <cling/Interpreter/Interpreter.h>
+#include <cling/Interpreter/Value.h>
+#include <cling/Utils/Casting.h>
+
 #include <iostream>
 #include <string>
 
@@ -111,6 +116,8 @@ void tab(int indent) {
 struct component_meta_data {
     ftxui::ScreenInteractive *screen;
     ftxui::Components components;
+    cling::Interpreter *interp;
+    cling::Value *res;
 };
 
 struct ast_printer {
@@ -139,6 +146,10 @@ struct node_printer : boost::static_visitor<> {
         if (text.func == "Exit") {
             data->components.push_back(ftxui::Button(
                 text.placeholder, data->screen->ExitLoopClosure()));
+        } else {
+            data->interp->process(text.func, data->res);
+            data->components.push_back(ftxui::Button(
+                text.placeholder, data->res->getAs<std::function<void()>>()));
         }
     }
 
