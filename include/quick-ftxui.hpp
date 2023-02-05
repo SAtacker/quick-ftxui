@@ -49,7 +49,6 @@ struct input {
 };
 
 struct expression {
-    button first;
     std::list<node> rest;
 };
 
@@ -88,7 +87,6 @@ BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::input,
 )
 
 BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::expression,
-                          (client::quick_ftxui_ast::button, first)
                           (std::list<client::quick_ftxui_ast::node>, rest)
 )
 
@@ -162,7 +160,6 @@ void ast_printer::operator()(
     std::cout << "tag: "
               << "Node" << std::endl;
     std::cout << '{' << std::endl;
-    node_printer(data, indent).operator()(expr.first);
 
     for (quick_ftxui_ast::node const &node : expr.rest) {
         boost::apply_visitor(node_printer(data, indent), node);
@@ -215,7 +212,7 @@ struct parser
 
         node = button_comp | input_comp | expression;
 
-        expression = '{' >> button_comp >> *node >> '}';
+        expression = '{' >> *node >> '}';
 
         // Debugging and error handling and reporting support.
         BOOST_SPIRIT_DEBUG_NODES((button_comp)(expression));
