@@ -49,7 +49,7 @@ struct input {
 };
 
 struct expression {
-    std::list<node> rest;
+    std::list<node> expr;
 };
 
 // print function for debugging
@@ -87,7 +87,7 @@ BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::input,
 )
 
 BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::expression,
-                          (std::list<client::quick_ftxui_ast::node>, rest)
+                          (std::list<client::quick_ftxui_ast::node>, expr)
 )
 
 // clang-format on
@@ -161,7 +161,7 @@ void ast_printer::operator()(
               << "Node" << std::endl;
     std::cout << '{' << std::endl;
 
-    for (quick_ftxui_ast::node const &node : expr.rest) {
+    for (quick_ftxui_ast::node const &node : expr.expr) {
         boost::apply_visitor(node_printer(data, indent), node);
     }
 
