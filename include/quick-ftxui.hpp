@@ -18,6 +18,9 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
+
+int value = 0; 
 
 namespace client {
 namespace qi = boost::spirit::qi;
@@ -31,9 +34,11 @@ struct nil {};
 struct button;
 struct expression;
 struct input;
+struct toggle;
 
 typedef boost::variant<nil, boost::recursive_wrapper<button>,
                        boost::recursive_wrapper<input>,
+                       boost::recursive_wrapper<toggle>,
                        boost::recursive_wrapper<expression>>
     node;
 
@@ -48,8 +53,12 @@ struct input {
     std::string option;
 };
 
+struct toggle{
+    std::vector<std::string> entries;
+    int selected;
+};
+
 struct expression {
-    button first;
     std::list<node> rest;
 };
 
@@ -72,6 +81,12 @@ inline std::ostream &operator<<(std::ostream &out, input b) {
     return out;
 }
 
+// print function for debugging
+inline std::ostream &operator<<(std::ostream &out, toggle b) {
+    out << "Entry: " << b.entries[0] << b.entries[1] << " Selected: " << b.selected;
+    return out;
+}
+
 } // namespace quick_ftxui_ast
 } // namespace client
 
@@ -88,10 +103,13 @@ BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::input,
 )
 
 BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::expression,
-                          (client::quick_ftxui_ast::button, first)
                           (std::list<client::quick_ftxui_ast::node>, rest)
 )
 
+BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::toggle,
+                          (std::vector<std::string>, entries)
+                          (int, selected)
+)
 // clang-format on
 
 namespace client {
@@ -112,6 +130,12 @@ struct component_meta_data {
     ftxui::ScreenInteractive *screen;
     ftxui::Components components;
 };
+
+void increment(int a)
+{
+    a++;
+    std::cout<<a;
+}
 
 struct ast_printer {
     ast_printer(component_meta_data *data_, int indent = 0)
@@ -136,15 +160,35 @@ struct node_printer : boost::static_visitor<> {
     void operator()(quick_ftxui_ast::button const &text) const {
         tab(indent + tabsize);
         std::cout << "button: " << text << std::endl;
+      
         if (text.func == "Exit") {
             data->components.push_back(ftxui::Button(
                 text.placeholder, data->screen->ExitLoopClosure()));
         }
+        if (text.func == "Increment") {
+            
+            data->components.push_back(ftxui::Button(
+                text.placeholder, [&] { value++; }));
+        }
+        if (text.func == "Decrement") {
+            
+            data->components.push_back(ftxui::Button(
+                text.placeholder, [&] { value--; }));
+        }
+        
     }
 
     void operator()(quick_ftxui_ast::input const &text) const {
         tab(indent + tabsize);
         std::cout << "input: " << text << std::endl;
+    }
+
+    void operator()(quick_ftxui_ast::toggle const &text) const {
+        tab(indent + tabsize);
+        std::cout << "toggle: " << text << std::endl;
+        auto x = (int*)(&text.selected);
+        // int a = text.selected;
+        data->components.push_back(ftxui::Toggle(&text.entries, x));
     }
 
     void operator()(quick_ftxui_ast::nil const &text) const {
@@ -162,7 +206,6 @@ void ast_printer::operator()(
     std::cout << "tag: "
               << "Node" << std::endl;
     std::cout << '{' << std::endl;
-    node_printer(data, indent).operator()(expr.first);
 
     for (quick_ftxui_ast::node const &node : expr.rest) {
         boost::apply_visitor(node_printer(data, indent), node);
@@ -213,21 +256,25 @@ struct parser
         input_comp %= qi::lit("Input") >> '{' >> quoted_string >> ',' >>
                       quoted_string >> ',' >> quoted_string >> '}';
 
-        node = button_comp | input_comp | expression;
+        toggle_comp %= qi::lit("Toggle") >> '{' >> '(' >> +quoted_string >> ')' >> ',' >> qi::int_ >> '}';
 
-        expression = '{' >> button_comp >> *node >> '}';
+        node = button_comp | input_comp | toggle_comp | expression;
+
+        expression = '{' >> *node >> '}';
 
         // Debugging and error handling and reporting support.
         BOOST_SPIRIT_DEBUG_NODES((button_comp)(expression));
 
         // Error handling
-        on_error<fail>(button_comp, error_handler(_4, _3, _2));
+        on_error<fail>(toggle_comp, error_handler(_4, _3, _2));
     }
     qi::rule<Iterator, quick_ftxui_ast::expression(), ascii::space_type>
         expression;
     qi::rule<Iterator, quick_ftxui_ast::node(), ascii::space_type> node;
     qi::rule<Iterator, quick_ftxui_ast::button(), ascii::space_type>
         button_comp;
+    qi::rule<Iterator, quick_ftxui_ast::toggle(), ascii::space_type>
+        toggle_comp;
     qi::rule<Iterator, quick_ftxui_ast::input(), ascii::space_type> input_comp;
     qi::rule<Iterator, std::string(), ascii::space_type> quoted_string;
 };
@@ -236,3 +283,4 @@ struct parser
 } // namespace client
 
 #endif // QUICK_FTXUI_HPP
+

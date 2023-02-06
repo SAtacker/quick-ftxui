@@ -1,14 +1,15 @@
 {
     Button{
-        "Button1",
-        "Exit"
+        "Increment",
+        "Increment"
     }
     Button{
-        "Button2",
-        "Exit"
+        "Decrement",
+        "Decrement"
     }
     Button{
-        "arg3",
-        "Nothin"
+        "Exit",
+        "Exit"
     }
 }
+

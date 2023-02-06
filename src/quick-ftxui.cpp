@@ -48,9 +48,12 @@ int main(int argc, char **argv) {
         printer(expression);
         if (data.components.size()) {
             auto component =
-                ftxui::Container::Vertical(std::move(data.components));
+                ftxui::Container::Horizontal(std::move(data.components));
             auto main_renderer = ftxui::Renderer(
-                component, [&] { return ftxui::vbox({component->Render()}); });
+                component, [&] { return ftxui::vbox({ftxui::text("value = " + std::to_string(value)),
+               ftxui::separator(),
+               ftxui::gauge(value * 0.01f),
+               ftxui::separator(),component->Render()});}); 
             screen.Loop(main_renderer);
         }
     } else {
@@ -58,5 +61,9 @@ int main(int argc, char **argv) {
         std::cout << "Parsing failed\n";
         std::cout << "-------------------------\n";
     }
+
+    std::cout<<value<<std::endl;
+
+    
     return 0;
 }
