@@ -131,12 +131,6 @@ struct component_meta_data {
     ftxui::Components components;
 };
 
-void increment(int a)
-{
-    a++;
-    std::cout<<a;
-}
-
 struct ast_printer {
     ast_printer(component_meta_data *data_, int indent = 0)
         : indent(indent), data(data_) {}
