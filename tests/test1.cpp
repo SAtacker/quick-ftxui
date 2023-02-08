@@ -37,6 +37,13 @@ TEST_CASE("Parse Complex") {
         }"));
 }
 
+TEST_CASE("Parse Multiple in any order") {
+    REQUIRE(parse_helper("{\
+        Input{\"amool\" , \"bmpp\", \"cmqq\"}  \
+        Button{\"amool\" , \"bmpp\"}\
+        }"));
+}
+
 TEST_CASE("Parse Recursive") {
     // expect pass
     REQUIRE(parse_helper("{\

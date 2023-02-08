@@ -7,8 +7,5 @@
         "Button2",
         "Exit"
     }
-    Button{
-        "arg3",
-        "Nothin"
-    }
+  
 }
