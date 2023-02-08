@@ -19,8 +19,19 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <functional>
 
 int value = 0; 
+
+void increment()
+{
+  value++;
+}
+
+void decrement()
+{
+    value--;
+}
 
 namespace client {
 namespace qi = boost::spirit::qi;
@@ -154,20 +165,27 @@ struct node_printer : boost::static_visitor<> {
     void operator()(quick_ftxui_ast::button const &text) const {
         tab(indent + tabsize);
         std::cout << "button: " << text << std::endl;
-      
+
+        typedef void(*inc)();
+
+        inc f_inc = increment;
+        inc f_dec = decrement;
+
         if (text.func == "Exit") {
             data->components.push_back(ftxui::Button(
                 text.placeholder, data->screen->ExitLoopClosure()));
         }
+
         if (text.func == "Increment") {
             
             data->components.push_back(ftxui::Button(
-                text.placeholder, [&] { value++; }));
+                text.placeholder, f_inc));
         }
-        if (text.func == "Decrement") {
+
+         if (text.func == "Decrement") {
             
-            data->components.push_back(ftxui::Button(
-                text.placeholder, [&] { value--; }));
+        data->components.push_back(ftxui::Button(
+                text.placeholder, f_dec));
         }
         
     }

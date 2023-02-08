@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
         printer(expression);
         if (data.components.size()) {
             auto component =
-                ftxui::Container::Horizontal(std::move(data.components));
+                ftxui::Container::Vertical(std::move(data.components));
             auto main_renderer = ftxui::Renderer(
                 component, [&] { return ftxui::vbox({ftxui::text("value = " + std::to_string(value)),
                ftxui::separator(),
