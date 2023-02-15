@@ -32,6 +32,8 @@ struct button;
 struct expression;
 struct input;
 
+enum block_alignment { VERTICAL, HORIZONTAL };
+
 typedef boost::variant<nil, boost::recursive_wrapper<button>,
                        boost::recursive_wrapper<input>,
                        boost::recursive_wrapper<expression>>
@@ -49,6 +51,7 @@ struct input {
 };
 
 struct expression {
+    block_alignment al;
     std::list<node> expr;
 };
 
@@ -88,6 +91,7 @@ BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::input,
 
 BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::expression,
                           (std::list<client::quick_ftxui_ast::node>, expr)
+                          (client::quick_ftxui_ast::block_alignment, al)
 )
 
 // clang-format on
@@ -128,6 +132,19 @@ struct node_printer : boost::static_visitor<> {
         : indent(indent), data(data_) {}
 
     void operator()(client::quick_ftxui_ast::expression const &expr) const {
+        switch (expr.al) {
+        case quick_ftxui_ast::block_alignment::VERTICAL: {
+            data->components.push_back(ftxui::Container::Vertical({}));
+            break;
+        }
+        case quick_ftxui_ast::block_alignment::HORIZONTAL: {
+            data->components.push_back(ftxui::Container::Horizontal({}));
+            break;
+        }
+        default:
+            throw std::runtime_error("Should never reach here");
+            break;
+        }
         ast_printer(data, indent + tabsize)(expr);
     }
 
@@ -135,8 +152,17 @@ struct node_printer : boost::static_visitor<> {
         tab(indent + tabsize);
         std::cout << "button: " << text << std::endl;
         if (text.func == "Exit") {
-            data->components.push_back(ftxui::Button(
-                text.placeholder, data->screen->ExitLoopClosure()));
+            if (data->components.size() > 0) {
+                auto last = data->components.back().get();
+                assert(last != nullptr);
+                last->Add(ftxui::Button(text.placeholder,
+                                        data->screen->ExitLoopClosure()));
+            } else {
+                data->components.push_back(ftxui::Container::Vertical({
+                    ftxui::Button(text.placeholder,
+                                  data->screen->ExitLoopClosure()),
+                }));
+            }
         }
     }
 
@@ -158,7 +184,8 @@ void ast_printer::operator()(
     client::quick_ftxui_ast::expression const &expr) const {
     tab(indent);
     std::cout << "tag: "
-              << "Node" << std::endl;
+              << "Node | Alignment:" << expr.al << std::endl;
+    tab(indent);
     std::cout << '{' << std::endl;
 
     for (quick_ftxui_ast::node const &node : expr.expr) {
@@ -202,6 +229,14 @@ struct parser
         using qi::fail;
         using qi::on_error;
 
+        // clang-format off
+        alignment_kw
+          .add
+          ("Vertical", quick_ftxui_ast::block_alignment::VERTICAL)
+          ("Horizontal", quick_ftxui_ast::block_alignment::HORIZONTAL)
+          ;
+        // clang-format on
+
         quoted_string %= qi::lexeme['"' >> +(char_ - '"') >> '"'];
 
         button_comp %= qi::lit("Button") >> '{' >> quoted_string >> ',' >>
@@ -212,10 +247,11 @@ struct parser
 
         node = button_comp | input_comp | expression;
 
-        expression = '{' >> *node >> '}';
+        expression = '{' >> *node >> '}' > alignment_kw;
 
         // Debugging and error handling and reporting support.
-        BOOST_SPIRIT_DEBUG_NODES((button_comp)(expression));
+        BOOST_SPIRIT_DEBUG_NODES(
+            (button_comp)(expression)(node)(input_comp)(button_comp));
 
         // Error handling
         on_error<fail>(button_comp, error_handler(_4, _3, _2));
@@ -227,6 +263,7 @@ struct parser
         button_comp;
     qi::rule<Iterator, quick_ftxui_ast::input(), ascii::space_type> input_comp;
     qi::rule<Iterator, std::string(), ascii::space_type> quoted_string;
+    qi::symbols<char, quick_ftxui_ast::block_alignment> alignment_kw;
 };
 } // namespace quick_ftxui_parser
 

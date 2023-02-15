@@ -3,9 +3,42 @@
         "Button1",
         "Exit"
     }
-    Button{
-        "Button2",
-        "Exit"
-    }
-  
-}
+    {
+        Button{
+            "Button2",
+            "Exit"
+        }
+        Button{
+            "Buttosfsmn2",
+            "Exit"
+        }
+        Button{
+            "Button3",
+            "Exit"
+        }
+        Button{
+            "Button4",
+            "Exit"
+        }
+        {
+            Button{
+                "Button5",
+                "Exit"
+            }
+            Button{
+                "Button6",
+                "Exit"
+            }
+        }Horizontal
+    }Horizontal
+    {
+        Button{
+            "Button7",
+            "Exit"
+        }
+        Button{
+            "Button8",
+            "Exit"
+        }
+    }Vertical
+}Horizontal
