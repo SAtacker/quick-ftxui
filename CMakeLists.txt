@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(quick-ftxui
-    LANGUAGES CXX
+	LANGUAGES C CXX
     VERSION 0.1.0
 )
 
@@ -8,6 +8,15 @@ find_package(Boost REQUIRED COMPONENTS regex)
 set(CMAKE_CXX_STANDARD_REQUIRED 17)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
+
+# ----------------- Cling stuff -----------------------------------------------
+
+set(LLVM_NO_DEAD_STRIP 1)
+
+find_package(Cling REQUIRED CONFIG)
+#if(NOT DEFINED ENV{CLING_DIR})
+#	message(FATAL_ERROR "You must set CLING_DIR environment variable")
+#endif()
 
 # --- Fetch FTXUI --------------------------------------------------------------
 include(FetchContent)
@@ -53,6 +62,7 @@ target_include_directories(quick-ftxui
     PRIVATE include 
     PRIVATE ${Boost_INCLUDE_DIR} 
     PRIVATE ${ftxui_SOURCE_DIR}
+	PRIVATE ${Cling_DIR}/../../../include
 )
 
 target_link_libraries(quick-ftxui
@@ -60,9 +70,13 @@ target_link_libraries(quick-ftxui
     PRIVATE ftxui::screen
     PRIVATE ftxui::dom
     PRIVATE ftxui::component # Not needed for this example.
+	PRIVATE clingInterpreter
 )
 
-target_compile_options(quick-ftxui PRIVATE -fsanitize=address)
+target_compile_options(quick-ftxui 
+	PRIVATE -fsanitize=address
+	PUBLIC -DLLVM_DIR="${LLVM_INSTALL_PREFIX}" -I${LLVM_INSTALL_PREFIX}/include
+)
 target_link_options(quick-ftxui PRIVATE -fsanitize=address)
 
 install(TARGETS quick-ftxui RUNTIME DESTINATION "bin")

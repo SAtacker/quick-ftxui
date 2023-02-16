@@ -43,7 +43,10 @@ int main(int argc, char **argv) {
         std::cout << "Parsing succeeded\n";
         std::cout << source_code << " Parses OK: " << std::endl;
         auto screen = ftxui::ScreenInteractive::Fullscreen();
-        client::quick_ftxui_parser::component_meta_data data{&screen, {}};
+        cling::Interpreter interp(0, nullptr, LLVM_DIR);
+
+        client::quick_ftxui_parser::component_meta_data data{
+            &screen, {}, &interp, {}};
         client::quick_ftxui_parser::ast_printer printer(&data, 0);
         printer(expression);
         if (data.components.size()) {
