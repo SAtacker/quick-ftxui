@@ -31,9 +31,11 @@ struct nil {};
 struct button;
 struct expression;
 struct input;
+struct dropdown;
 
 typedef boost::variant<nil, boost::recursive_wrapper<button>,
                        boost::recursive_wrapper<input>,
+                       boost::recursive_wrapper<dropdown>,
                        boost::recursive_wrapper<expression>>
     node;
 
@@ -46,6 +48,11 @@ struct input {
     std::string placeholder;
     std::string temp;
     std::string option;
+};
+
+struct dropdown {
+    std::vector<std::string> entries;
+    int selected = 0;
 };
 
 struct expression {
@@ -84,6 +91,11 @@ BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::input,
                           (std::string, placeholder)
                           (std::string, temp)
                           (std::string, option)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::dropdown,
+                          (std::vector<std::string>, entries)
+                          (int, selected)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::expression,
@@ -143,6 +155,12 @@ struct node_printer : boost::static_visitor<> {
     void operator()(quick_ftxui_ast::input const &text) const {
         tab(indent + tabsize);
         std::cout << "input: " << text << std::endl;
+    }
+
+    void operator()(quick_ftxui_ast::dropdown const &text) const {
+        tab(indent + tabsize);
+            data->components.push_back(ftxui::Dropdown(
+                &text.entries, (int *)&text.selected ));
     }
 
     void operator()(quick_ftxui_ast::nil const &text) const {
@@ -210,7 +228,9 @@ struct parser
         input_comp %= qi::lit("Input") >> '{' >> quoted_string >> ',' >>
                       quoted_string >> ',' >> quoted_string >> '}';
 
-        node = button_comp | input_comp | expression;
+        dropdown_comp %= qi::lit("Dropdown") >> '{' >> '[' >> *quoted_string  >> ']'>> ',' >> qi::int_ >> '}';
+
+        node = button_comp | input_comp | dropdown_comp | expression;
 
         expression = '{' >> *node >> '}';
 
@@ -225,7 +245,9 @@ struct parser
     qi::rule<Iterator, quick_ftxui_ast::node(), ascii::space_type> node;
     qi::rule<Iterator, quick_ftxui_ast::button(), ascii::space_type>
         button_comp;
+    qi::rule<Iterator, quick_ftxui_ast::dropdown(), ascii::space_type> dropdown_comp;
     qi::rule<Iterator, quick_ftxui_ast::input(), ascii::space_type> input_comp;
+
     qi::rule<Iterator, std::string(), ascii::space_type> quoted_string;
 };
 } // namespace quick_ftxui_parser
