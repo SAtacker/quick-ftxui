@@ -132,16 +132,18 @@ struct node_printer : boost::static_visitor<> {
         : indent(indent), data(data_) {}
 
     void operator()(client::quick_ftxui_ast::expression const &expr) const {
-        component_meta_data data_nest;
+        component_meta_data data_nest{data->screen};
         ast_printer(&data_nest, indent + tabsize)(expr);
 
         switch (expr.align) {
         case quick_ftxui_ast::block_alignment::VERTICAL: {
-            data->components.push_back(ftxui::Container::Vertical({(data_nest).components}));
+            data->components.push_back(
+                ftxui::Container::Vertical({(data_nest).components}));
             break;
         }
         case quick_ftxui_ast::block_alignment::HORIZONTAL: {
-            data->components.push_back(ftxui::Container::Horizontal({(data_nest).components}));
+            data->components.push_back(
+                ftxui::Container::Horizontal({(data_nest).components}));
             break;
         }
         default:

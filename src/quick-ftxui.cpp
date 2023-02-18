@@ -51,16 +51,16 @@ int main(int argc, char **argv) {
                 case client::quick_ftxui_ast::block_alignment::HORIZONTAL: {
                     auto component =
                         ftxui::Container::Horizontal(std::move(data.components));
-                    auto main_renderer = ftxui::Renderer(
-                        component, [&] { return ftxui::vbox({component->Render()}); });
+                    auto main_renderer = ftxui::Renderer(component, [&] {
+                        return ftxui::vbox({component->Render()}); });
                     screen.Loop(main_renderer);
                     break;
                 }
                 case client::quick_ftxui_ast::block_alignment::VERTICAL: {
                     auto component =
                         ftxui::Container::Vertical(std::move(data.components));
-                    auto main_renderer = ftxui::Renderer(
-                        component, [&] { return ftxui::vbox({component->Render()}); });
+                    auto main_renderer = ftxui::Renderer(component, [&] { 
+                        return ftxui::vbox({component->Render()}); });
                     screen.Loop(main_renderer);
                     break;
                 }     
