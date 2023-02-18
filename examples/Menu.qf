@@ -1,0 +1,6 @@
+{
+    Menu{
+        [ "Physics"  "Maths"  "Chemistry"  "Biology"],
+        0
+    }
+}
