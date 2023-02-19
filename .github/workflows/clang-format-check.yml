@@ -1,5 +1,19 @@
 name: clang-format Check
-on: [push, pull_request]
+
+on:
+  push:
+    paths:
+      - ".github/workflows/linux_build.yml"
+      - "include/**"
+      - "src/**"
+      - "tests/**"
+  pull_request:
+    paths:
+      - ".github/workflows/linux_build.yml"
+      - "include/**"
+      - "src/**"
+      - "tests/**"
+
 jobs:
   formatting-check:
     name: Formatting Check
