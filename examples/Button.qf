@@ -1,4 +1,4 @@
-{
+Vertical{
     Button{
         "Button1",
         "Exit"
@@ -7,5 +7,14 @@
         "Button2",
         "Exit"
     }
-  
+    Horizontal{
+        Button{
+            "Button3",
+            "Exit"
+        }
+        Button{
+            "Button4",
+            "Exit"
+        }
+    }
 }

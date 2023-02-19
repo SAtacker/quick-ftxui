@@ -32,6 +32,8 @@ struct button;
 struct expression;
 struct input;
 
+enum block_alignment { VERTICAL, HORIZONTAL };
+
 typedef boost::variant<nil, boost::recursive_wrapper<button>,
                        boost::recursive_wrapper<input>,
                        boost::recursive_wrapper<expression>>
@@ -49,6 +51,7 @@ struct input {
 };
 
 struct expression {
+    block_alignment align;
     std::list<node> expr;
 };
 
@@ -87,6 +90,7 @@ BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::input,
 )
 
 BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::expression,
+                          (client::quick_ftxui_ast::block_alignment, align)
                           (std::list<client::quick_ftxui_ast::node>, expr)
 )
 
@@ -128,7 +132,24 @@ struct node_printer : boost::static_visitor<> {
         : indent(indent), data(data_) {}
 
     void operator()(client::quick_ftxui_ast::expression const &expr) const {
-        ast_printer(data, indent + tabsize)(expr);
+        component_meta_data data_nest{data->screen};
+        ast_printer(&data_nest, indent + tabsize)(expr);
+
+        switch (expr.align) {
+        case quick_ftxui_ast::block_alignment::VERTICAL: {
+            data->components.push_back(
+                ftxui::Container::Vertical({(data_nest).components}));
+            break;
+        }
+        case quick_ftxui_ast::block_alignment::HORIZONTAL: {
+            data->components.push_back(
+                ftxui::Container::Horizontal({(data_nest).components}));
+            break;
+        }
+        default:
+            throw std::runtime_error("Should never reach here");
+            break;
+        }
     }
 
     void operator()(quick_ftxui_ast::button const &text) const {
@@ -158,7 +179,8 @@ void ast_printer::operator()(
     client::quick_ftxui_ast::expression const &expr) const {
     tab(indent);
     std::cout << "tag: "
-              << "Node" << std::endl;
+              << "Node | Alignment: " << expr.align << std::endl;
+    tab(indent);
     std::cout << '{' << std::endl;
 
     for (quick_ftxui_ast::node const &node : expr.expr) {
@@ -202,6 +224,14 @@ struct parser
         using qi::fail;
         using qi::on_error;
 
+        // clang-format off
+        alignment_kw
+          .add
+          ("Vertical", quick_ftxui_ast::block_alignment::VERTICAL)
+          ("Horizontal", quick_ftxui_ast::block_alignment::HORIZONTAL)
+          ;
+        // clang-format on
+
         quoted_string %= qi::lexeme['"' >> +(char_ - '"') >> '"'];
 
         button_comp %= qi::lit("Button") >> '{' >> quoted_string >> ',' >>
@@ -212,7 +242,7 @@ struct parser
 
         node = button_comp | input_comp | expression;
 
-        expression = '{' >> *node >> '}';
+        expression = alignment_kw >> '{' >> *node >> '}';
 
         // Debugging and error handling and reporting support.
         BOOST_SPIRIT_DEBUG_NODES((button_comp)(expression));
@@ -227,6 +257,7 @@ struct parser
         button_comp;
     qi::rule<Iterator, quick_ftxui_ast::input(), ascii::space_type> input_comp;
     qi::rule<Iterator, std::string(), ascii::space_type> quoted_string;
+    qi::symbols<char, quick_ftxui_ast::block_alignment> alignment_kw;
 };
 } // namespace quick_ftxui_parser
 
