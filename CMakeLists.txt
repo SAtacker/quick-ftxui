@@ -36,7 +36,7 @@ if(QUICK_FTXUI_TESTS)
     FetchContent_MakeAvailable(Catch2)
 
     add_executable(tests tests/test1.cpp)
-    target_link_libraries(tests 
+    target_link_libraries(tests
         PRIVATE Catch2::Catch2WithMain
         PRIVATE ftxui::screen
         PRIVATE ftxui::dom
@@ -49,9 +49,9 @@ if(QUICK_FTXUI_TESTS)
 endif()
 
 add_executable(quick-ftxui src/quick-ftxui.cpp)
-target_include_directories(quick-ftxui 
-    PRIVATE include 
-    PRIVATE ${Boost_INCLUDE_DIR} 
+target_include_directories(quick-ftxui
+    PRIVATE include
+    PRIVATE ${Boost_INCLUDE_DIR}
     PRIVATE ${ftxui_SOURCE_DIR}
 )
 
@@ -62,7 +62,10 @@ target_link_libraries(quick-ftxui
     PRIVATE ftxui::component # Not needed for this example.
 )
 
-target_compile_options(quick-ftxui PRIVATE -fsanitize=address)
-target_link_options(quick-ftxui PRIVATE -fsanitize=address)
+if(WIN32)
+else()
+    target_compile_options(quick-ftxui PRIVATE -fsanitize=address)
+    target_link_options(quick-ftxui PRIVATE -fsanitize=address)
+endif()
 
 install(TARGETS quick-ftxui RUNTIME DESTINATION "bin")
