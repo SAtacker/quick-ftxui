@@ -25,7 +25,7 @@ if(QUICK_FTXUI_FETCH_BOOST)
 
     if(NOT EX_PRC STREQUAL EX_PRC_INTERNAL)
         if(WIN32)
-            execute_process(COMMAND cmd /C "cd ${CMAKE_BINARY_DIR}\\_dep\\boost-src && bootstrap.bat && .\\b2 headers" ${EX_PRC} OUTPUT_VARIABLE RESULT)
+            execute_process(COMMAND cmd /C "cd ${CMAKE_BINARY_DIR}\\_deps\\boost-src && bootstrap.bat && .\\b2 headers" ${EX_PRC} OUTPUT_VARIABLE RESULT)
         else()
             execute_process(COMMAND sh -c "cd ${CMAKE_BINARY_DIR}/_deps/boost-src && ./bootstrap.sh && ./b2 headers" ${EX_PRC} OUTPUT_VARIABLE RESULT)
         endif()
