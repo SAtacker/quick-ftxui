@@ -4,30 +4,40 @@ project(quick-ftxui
     VERSION 0.1.0
 )
 
-find_package(Boost REQUIRED COMPONENTS regex)
 set(CMAKE_CXX_STANDARD_REQUIRED 17)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
 
-
 # --- Fetch boost --------------------------------------------------------------
-option(QUICK_FTXUI_BOOST "Enable boost fetching from GitHub" ON)
-if(QUICK_FTXUI_BOOST)
-set(BOOST_ENABLE_CMAKE ON)
+option(QUICK_FTXUI_FETCH_BOOST "Enable boost fetching from GitHub" OFF)
+
 include(FetchContent)
-FetchContent_Declare(
-  Boost
-  GIT_REPOSITORY https://github.com/boostorg/spirit.git
-  GIT_TAG boost-1.81.0
-)
-FetchContent_MakeAvailable(Boost)
+
+if(QUICK_FTXUI_FETCH_BOOST)
+    FetchContent_Declare(Boost
+        URL https://github.com/boostorg/boost/releases/download/boost-1.81.0/boost-1.81.0.tar.gz
+        TLS_VERIFY true
+    )
+    FetchContent_Populate(Boost)
+
+    set(EX_PRC "Execute process" CACHE STRING "Used by command line tool.")
+    set(EX_PRC_INTERNAL "" CACHE INTERNAL "for internal use only; do not modify")
+
+    if(NOT EX_PRC STREQUAL EX_PRC_INTERNAL)
+        if(WIN32)
+            execute_process(COMMAND cmd /C "cd ${CMAKE_BINARY_DIR}\\_dep\\boost-src && bootstrap.bat && .\\b2 headers" ${EX_PRC} OUTPUT_VARIABLE RESULT)
+        else()
+            execute_process(COMMAND sh -c "cd ${CMAKE_BINARY_DIR}/_deps/boost-src && ./bootstrap.sh && ./b2 headers" ${EX_PRC} OUTPUT_VARIABLE RESULT)
+        endif()
+
+        set(Boost_INCLUDE_DIR "${CMAKE_BINARY_DIR}/_deps/boost-src")
+        set(EX_PRC_INTERNAL ${EX_PRC} CACHE INTERNAL "for internal use only; do not modify")
+    endif()
 else()
-find_package(Boost 1.81.0 REQUIRED COMPONENTS spirit) 
+    find_package(Boost REQUIRED)
 endif()
 
 # --- Fetch FTXUI --------------------------------------------------------------
-include(FetchContent)
-
 set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE)
 FetchContent_Declare(ftxui
     GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
@@ -58,7 +68,10 @@ if(QUICK_FTXUI_TESTS)
         PRIVATE ftxui::dom
         PRIVATE ftxui::component
     )
-    target_include_directories(tests PRIVATE include)
+    target_include_directories(tests
+        PRIVATE include
+        PRIVATE ${Boost_INCLUDE_DIR}
+    )
     include(CTest)
     include(Catch)
     catch_discover_tests(tests)

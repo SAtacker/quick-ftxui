@@ -1,17 +1,17 @@
-name: Windows Build
+name: Windows Build No Boost fetch
 
 on:
   push:
     branches: [ master ]
     paths:
-      - ".github/workflows/windows_build.yml"
+      - ".github/workflows/windows_build_no_boost.yml"
       - "include/**"
       - "src/**"
       - "tests/**"
   pull_request:
     branches: [ master ]
     paths:
-      - ".github/workflows/windows_build.yml"
+      - ".github/workflows/windows_build_no_boost.yml"
       - "include/**"
       - "src/**"
       - "tests/**"
@@ -24,14 +24,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install Boost
-      run: |
-        vcpkg integrate install
-        vcpkg install boost-spirit --triplet x64-windows
-        vcpkg install boost-regex --triplet x64-windows
-
     - name: Configure CMake
-      run: cmake -S . -B build "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake"
+      run: cmake -S . -B build "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" -DQUICK_FTXUI_FETCH_BOOST=ON
         
     - name: Build
       run: cmake --build build --config Release --parallel
