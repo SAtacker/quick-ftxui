@@ -1,4 +1,4 @@
-name: Linux Build No boost fetch
+name: Linux Build Boost Fetch
 
 on:
   push:

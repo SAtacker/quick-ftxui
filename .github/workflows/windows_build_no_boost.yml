@@ -1,4 +1,4 @@
-name: Windows Build No Boost fetch
+name: Windows Build Boost Fetch
 
 on:
   push:
