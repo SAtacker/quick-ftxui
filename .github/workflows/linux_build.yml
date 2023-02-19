@@ -8,6 +8,7 @@ on:
       - "include/**"
       - "src/**"
       - "tests/**"
+      - "CMakeLists.txt"
   pull_request:
     branches: [ master ]
     paths:
@@ -15,6 +16,7 @@ on:
       - "include/**"
       - "src/**"
       - "tests/**"
+      - "CMakeLists.txt"
 
 jobs:
   build:
