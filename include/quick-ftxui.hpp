@@ -33,10 +33,9 @@ struct expression;
 struct input;
 struct menu;
 
-typedef boost::variant<nil, boost::recursive_wrapper<button>,
-                       boost::recursive_wrapper<menu>,
-                       boost::recursive_wrapper<input>,
-                       boost::recursive_wrapper<expression>>
+typedef boost::variant<
+    nil, boost::recursive_wrapper<button>, boost::recursive_wrapper<menu>,
+    boost::recursive_wrapper<input>, boost::recursive_wrapper<expression>>
     node;
 
 struct button {
@@ -159,8 +158,8 @@ struct node_printer : boost::static_visitor<> {
 
     void operator()(quick_ftxui_ast::menu const &text) const {
         tab(indent + tabsize);
-            data->components.push_back(ftxui::Menu(
-                &text.entries, (int *)&text.selected ));
+        data->components.push_back(
+            ftxui::Menu(&text.entries, (int *)&text.selected));
     }
 
     void operator()(quick_ftxui_ast::nil const &text) const {
@@ -228,7 +227,8 @@ struct parser
         input_comp %= qi::lit("Input") >> '{' >> quoted_string >> ',' >>
                       quoted_string >> ',' >> quoted_string >> '}';
 
-        menu_comp %= qi::lit("Menu") >> '{' >> '[' >> *quoted_string  >> ']'>> ',' >> qi::int_ >> '}';
+        menu_comp %= qi::lit("Menu") >> '{' >> '[' >> *quoted_string >> ']' >>
+                     ',' >> qi::int_ >> '}';
 
         node = button_comp | input_comp | menu_comp | expression;
 
