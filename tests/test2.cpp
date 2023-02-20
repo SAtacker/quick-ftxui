@@ -1,0 +1,76 @@
+#include "quick-ftxui.hpp"
+#include <catch2/catch_test_macros.hpp>
+#include <string>
+
+auto parse_helper(std::string &&str) {
+    typedef std::string::const_iterator iterator_type;
+    typedef client::quick_ftxui_parser::parser<iterator_type> parser;
+    typedef client::quick_ftxui_ast::expression expression_type;
+
+    parser parse;               // Our grammar
+    expression_type expression; // Our program (AST)
+    std::string::const_iterator iter = str.begin();
+    std::string::const_iterator end = str.end();
+    boost::spirit::ascii::space_type space;
+
+    return boost::spirit::qi::phrase_parse(iter, end, parse, space,
+                                           expression) &&
+           iter == end;
+}
+
+TEST_CASE("Parse Simple") {
+    REQUIRE(parse_helper("{Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\" 0 \"}}"));
+    REQUIRE(parse_helper("{           Menu{          \"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\"    ,       "
+                         "\"0\" }           }"));
+    REQUIRE(!parse_helper("{_Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}}"));
+    REQUIRE(!parse_helper("{_Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}_}"));
+    REQUIRE(!parse_helper("_{_Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}_}"));
+    REQUIRE(!parse_helper("{Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"],\"0\"}}"));
+    REQUIRE(!parse_helper("{Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\" . \"0\"}}"));
+}
+
+TEST_CASE("Parse Complex") {
+    REQUIRE(parse_helper("{\
+        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}}"));
+    REQUIRE(parse_helper("{\
+        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}\
+        }"));
+}
+
+TEST_CASE("Parse Multiple in any order") {
+    REQUIRE(parse_helper("{\
+        Input{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\" , \"0\", \"cmqq\"}  \
+        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\" , \"0\"}\
+        }"));
+}
+
+TEST_CASE("Parse Recursive") {
+    // expect pass
+    REQUIRE(parse_helper("{\
+        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}             \
+        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}             \
+        }"));
+    REQUIRE(parse_helper("{\
+        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"  }             \
+            Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}          \
+                                               \
+                           Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"  }                         \
+                                   \
+        \
+        }"));
+
+    // expect fail
+    REQUIRE(!parse_helper("{\
+        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"               \
+            Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}          \
+        }\
+        }"));
+    REQUIRE(!parse_helper("{\
+        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"  }             \
+            Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}          \
+            {                                   \
+                           Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"  }                         \
+            }                       \
+        }\
+        }"));
+}

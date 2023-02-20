@@ -61,7 +61,7 @@ if(QUICK_FTXUI_TESTS)
 
     FetchContent_MakeAvailable(Catch2)
 
-    add_executable(tests tests/test1.cpp)
+    add_executable(tests tests/test1.cpp tests/test2.cpp)
     target_link_libraries(tests
         PRIVATE Catch2::Catch2WithMain
         PRIVATE ftxui::screen
