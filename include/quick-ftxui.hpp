@@ -33,9 +33,9 @@ struct expression;
 struct input;
 struct menu;
 
-typedef boost::variant<
-    nil, boost::recursive_wrapper<button>, boost::recursive_wrapper<menu>,
-    boost::recursive_wrapper<input>, boost::recursive_wrapper<expression>>
+typedef boost::variant<nil, boost::recursive_wrapper<button>,
+                       boost::recursive_wrapper<input>,
+                       boost::recursive_wrapper<expression>>
     node;
 
 struct button {

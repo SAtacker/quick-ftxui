@@ -27,6 +27,14 @@ TEST_CASE("Parse Simple") {
     REQUIRE(!parse_helper("_{_Button{\"amool\",\"bmpp\"}_}"));
     REQUIRE(!parse_helper("{Button{\"amool,\"bmpp\"}}"));
     REQUIRE(!parse_helper("{Button{\"amool\" . \"bmpp\"}}"));
+    REQUIRE(parse_helper("{Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\" 0 \"}}"));
+    REQUIRE(parse_helper("{           Menu{          \"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\"    ,       "
+                         "\"0\" }           }"));
+    REQUIRE(!parse_helper("{_Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}}"));
+    REQUIRE(!parse_helper("{_Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}_}"));
+    REQUIRE(!parse_helper("_{_Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}_}"));
+    REQUIRE(!parse_helper("{Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"],\"0\"}}"));
+    REQUIRE(!parse_helper("{Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\" . \"0\"}}"));
 }
 
 TEST_CASE("Parse Complex") {
@@ -35,12 +43,21 @@ TEST_CASE("Parse Complex") {
     REQUIRE(parse_helper("{\
         Button{\"amool\",\"bmpp\"}\
         }"));
+    REQUIRE(parse_helper("{\
+        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}}"));
+    REQUIRE(parse_helper("{\
+        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}\
+        }"));
 }
 
 TEST_CASE("Parse Multiple in any order") {
     REQUIRE(parse_helper("{\
         Input{\"amool\" , \"bmpp\", \"cmqq\"}  \
         Button{\"amool\" , \"bmpp\"}\
+        }"));
+    REQUIRE(parse_helper("{\
+        Input{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\" , \"0\", \"cmqq\"}  \
+        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\" , \"0\"}\
         }"));
 }
 
@@ -58,6 +75,18 @@ TEST_CASE("Parse Recursive") {
                                    \
         \
         }"));
+    REQUIRE(parse_helper("{\
+        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}             \
+        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}             \
+        }"));
+    REQUIRE(parse_helper("{\
+        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"  }             \
+            Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}          \
+                                               \
+                           Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"  }                         \
+                                   \
+        \
+        }"));
 
     // expect fail
     REQUIRE(!parse_helper("{\
@@ -70,6 +99,19 @@ TEST_CASE("Parse Recursive") {
             Button{\"amool\",\"bmpp\"}          \
             {                                   \
                            Button{\"amool\",\"bmpp\"  }                         \
+            }                       \
+        }\
+        }"));
+    REQUIRE(!parse_helper("{\
+        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"               \
+            Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}          \
+        }\
+        }"));
+    REQUIRE(!parse_helper("{\
+        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"  }             \
+            Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}          \
+            {                                   \
+                           Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"  }                         \
             }                       \
         }\
         }"));
