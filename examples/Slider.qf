@@ -1,0 +1,31 @@
+Vertical{
+    Slider{
+        "Slider 1: ",
+        50,
+        0,
+        100,
+        1
+    }
+    Horizontal{
+        Slider{
+            "Slider 2: ",
+            10,
+            0,
+            100,
+            2
+        }
+        Slider{
+            "Slider 3: ",
+            90,
+            0,
+            100,
+            5
+        }
+    }
+    Horizontal{
+        Button{
+            "Exit",
+            "Exit"
+        }
+    }
+}
