@@ -1,19 +1,26 @@
-{
+Vertical{
     Button{
         "arg1",
-        "arg2"
+        "Exit"
     }
-    Button{
-        "arg3",
-        "arg4"
+    Slider{
+        "arg2",
+        50,
+        0,
+        100,
+        1
     }
-    Button{
-        "arg5",
-        "arg6"
-    }
-    Input{
-        "arg6",
-        "arg7",
-        "arg8"
+    Horizontal{
+        Button{
+            "arg3",
+            "Exit"
+        }
+        Slider{
+            "arg4",
+            35, 
+            0,
+            100,
+            5
+        }
     }
 }

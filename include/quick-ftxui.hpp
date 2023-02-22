@@ -31,12 +31,13 @@ struct nil {};
 struct button;
 struct expression;
 struct input;
+struct slider;
 
 enum block_alignment { VERTICAL, HORIZONTAL };
 
-typedef boost::variant<nil, boost::recursive_wrapper<button>,
-                       boost::recursive_wrapper<input>,
-                       boost::recursive_wrapper<expression>>
+typedef boost::variant<
+    nil, boost::recursive_wrapper<button>, boost::recursive_wrapper<input>,
+    boost::recursive_wrapper<slider>, boost::recursive_wrapper<expression>>
     node;
 
 struct button {
@@ -48,6 +49,14 @@ struct input {
     std::string placeholder;
     std::string temp;
     std::string option;
+};
+
+struct slider {
+    std::string label;
+    int value;
+    int min;
+    int max;
+    int increment;
 };
 
 struct expression {
@@ -74,6 +83,13 @@ inline std::ostream &operator<<(std::ostream &out, input b) {
     return out;
 }
 
+inline std::ostream &operator<<(std::ostream &out, slider b) {
+    out << "Label: " << b.label << " | Value: " << b.value
+        << " | Min: " << b.min << " | Max: " << b.max
+        << " | Increment: " << b.increment;
+    return out;
+}
+
 } // namespace quick_ftxui_ast
 } // namespace client
 
@@ -87,6 +103,14 @@ BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::input,
                           (std::string, placeholder)
                           (std::string, temp)
                           (std::string, option)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::slider,
+                          (std::string, label)
+                          (int, value)
+                          (int, min)
+                          (int, max)
+                          (int, increment)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::expression,
@@ -159,6 +183,14 @@ struct node_printer : boost::static_visitor<> {
             data->components.push_back(ftxui::Button(
                 text.placeholder, data->screen->ExitLoopClosure()));
         }
+    }
+
+    void operator()(quick_ftxui_ast::slider const &text) const {
+        tab(indent + tabsize);
+        std::cout << "slider" << text << std::endl;
+        data->components.push_back(ftxui::Slider(text.label,
+                                                 (int *)(&text.value), text.min,
+                                                 text.max, text.increment));
     }
 
     void operator()(quick_ftxui_ast::input const &text) const {
@@ -240,7 +272,11 @@ struct parser
         input_comp %= qi::lit("Input") >> '{' >> quoted_string >> ',' >>
                       quoted_string >> ',' >> quoted_string >> '}';
 
-        node = button_comp | input_comp | expression;
+        slider_comp %= qi::lit("Slider") >> '{' >> quoted_string >> ',' >>
+                       qi::int_ >> ',' >> qi::int_ >> ',' >> qi::int_ >> ',' >>
+                       qi::int_ >> '}';
+
+        node = button_comp | input_comp | slider_comp | expression;
 
         expression = alignment_kw >> '{' >> *node >> '}';
 
@@ -257,6 +293,8 @@ struct parser
         button_comp;
     qi::rule<Iterator, quick_ftxui_ast::input(), ascii::space_type> input_comp;
     qi::rule<Iterator, std::string(), ascii::space_type> quoted_string;
+    qi::rule<Iterator, quick_ftxui_ast::slider(), ascii::space_type>
+        slider_comp;
     qi::symbols<char, quick_ftxui_ast::block_alignment> alignment_kw;
 };
 } // namespace quick_ftxui_parser
