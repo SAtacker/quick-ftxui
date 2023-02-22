@@ -72,7 +72,7 @@ TEST_CASE("Parse Multiple Components in any order") {
         }"));
 
     REQUIRE(parse_helper("Vertical{\
-        Slider{\"amool\" , \"bmpp\", \"cmqq\"}  \
+        Slider{\"amool\" , 20, 1, 100, 1}  \
         Button{\"amool\" , \"bmpp\"}  \
         }"));
 }
