@@ -67,7 +67,7 @@ TEST_CASE("Parse Complex") {
 
 TEST_CASE("Parse Multiple Components in any order") {
     REQUIRE(parse_helper("Horizontal{\
-        Slider{\"amool\" , \"bmpp\", \"cmqq\"}  \
+        Slider{\"amool\" , 20 , 1 , 100 , 1}  \
         Button{\"amool\" , \"bmpp\"}  \
         }"));
 
@@ -84,7 +84,7 @@ TEST_CASE("Parse Recursive") {
         Button{\"amool\",\"bmpp\"}  \
         Horizontal{\
             Slider{\"amool\", 40, 1, 100, 10}  \
-            Slider{\"amool\", 10, 1, 200, 100}}  \
+            Slider{\"amool\", 10, 1, 200, 100}  \
             Vertical{\
                 Button{\"amool\",\"bmpp\"}  \
                 Button{\"amool\",\"bmpp\"}  \
