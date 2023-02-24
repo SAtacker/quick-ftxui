@@ -50,10 +50,7 @@ int main(int argc, char **argv) {
             auto component =
                 ftxui::Container::Vertical(std::move(data.components));
             auto main_renderer = ftxui::Renderer(
-                component, [&] { return ftxui::vbox({ftxui::text("value = " + std::to_string(value)),
-               ftxui::separator(),
-               ftxui::gauge(value * 0.01f),
-               ftxui::separator(),component->Render()});}); 
+                component, [&] { return ftxui::vbox({component->Render()});}); 
             screen.Loop(main_renderer);
         }
     } else {
