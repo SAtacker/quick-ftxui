@@ -4,14 +4,40 @@ project(quick-ftxui
     VERSION 0.1.0
 )
 
-find_package(Boost REQUIRED COMPONENTS regex)
-set(CMAKE_CXX_STANDARD_REQUIRED 20)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED 17)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
 
-# --- Fetch FTXUI --------------------------------------------------------------
+# --- Fetch boost --------------------------------------------------------------
+option(QUICK_FTXUI_FETCH_BOOST "Enable boost fetching from GitHub" OFF)
+
 include(FetchContent)
 
+if(QUICK_FTXUI_FETCH_BOOST)
+    FetchContent_Declare(Boost
+        URL https://github.com/boostorg/boost/releases/download/boost-1.81.0/boost-1.81.0.tar.gz
+        TLS_VERIFY true
+    )
+    FetchContent_Populate(Boost)
+
+    set(EX_PRC "Execute process" CACHE STRING "Used by command line tool.")
+    set(EX_PRC_INTERNAL "" CACHE INTERNAL "for internal use only; do not modify")
+
+    if(NOT EX_PRC STREQUAL EX_PRC_INTERNAL)
+        if(WIN32)
+            execute_process(COMMAND cmd /C "cd ${CMAKE_BINARY_DIR}\\_deps\\boost-src && .\\bootstrap.bat && .\\b2 headers" OUTPUT_VARIABLE RESULT)
+        else()
+            execute_process(COMMAND sh -c "cd ${CMAKE_BINARY_DIR}/_deps/boost-src && ./bootstrap.sh && ./b2 headers" OUTPUT_VARIABLE RESULT)
+        endif()
+
+        set(Boost_INCLUDE_DIR "${CMAKE_BINARY_DIR}/_deps/boost-src")
+        set(EX_PRC_INTERNAL ${EX_PRC} CACHE INTERNAL "for internal use only; do not modify")
+    endif()
+else()
+    find_package(Boost REQUIRED)
+endif()
+
+# --- Fetch FTXUI --------------------------------------------------------------
 set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE)
 FetchContent_Declare(ftxui
     GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
@@ -36,22 +62,25 @@ if(QUICK_FTXUI_TESTS)
     FetchContent_MakeAvailable(Catch2)
 
     add_executable(tests tests/test1.cpp)
-    target_link_libraries(tests 
+    target_link_libraries(tests
         PRIVATE Catch2::Catch2WithMain
         PRIVATE ftxui::screen
         PRIVATE ftxui::dom
         PRIVATE ftxui::component
     )
-    target_include_directories(tests PRIVATE include)
+    target_include_directories(tests
+        PRIVATE include
+        PRIVATE ${Boost_INCLUDE_DIR}
+    )
     include(CTest)
     include(Catch)
     catch_discover_tests(tests)
 endif()
 
 add_executable(quick-ftxui src/quick-ftxui.cpp)
-target_include_directories(quick-ftxui 
-    PRIVATE include 
-    PRIVATE ${Boost_INCLUDE_DIR} 
+target_include_directories(quick-ftxui
+    PRIVATE include
+    PRIVATE ${Boost_INCLUDE_DIR}
     PRIVATE ${ftxui_SOURCE_DIR}
 )
 
@@ -62,7 +91,10 @@ target_link_libraries(quick-ftxui
     PRIVATE ftxui::component # Not needed for this example.
 )
 
-target_compile_options(quick-ftxui PRIVATE -fsanitize=address)
-target_link_options(quick-ftxui PRIVATE -fsanitize=address)
+if(WIN32)
+else()
+    target_compile_options(quick-ftxui PRIVATE -fsanitize=address)
+    target_link_options(quick-ftxui PRIVATE -fsanitize=address)
+endif()
 
 install(TARGETS quick-ftxui RUNTIME DESTINATION "bin")

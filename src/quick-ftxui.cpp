@@ -47,11 +47,26 @@ int main(int argc, char **argv) {
         client::quick_ftxui_parser::ast_printer printer(&data, 0);
         printer(expression);
         if (data.components.size()) {
-            auto component =
-                ftxui::Container::Vertical(std::move(data.components));
-            auto main_renderer = ftxui::Renderer(
-                component, [&] { return ftxui::vbox({component->Render()});}); 
-            screen.Loop(main_renderer);
+            switch (expression.align) {
+            case client::quick_ftxui_ast::block_alignment::HORIZONTAL: {
+                auto component =
+                    ftxui::Container::Horizontal(std::move(data.components));
+                auto main_renderer = ftxui::Renderer(component, [&] {
+                    return ftxui::vbox({component->Render()});
+                });
+                screen.Loop(main_renderer);
+                break;
+            }
+            case client::quick_ftxui_ast::block_alignment::VERTICAL: {
+                auto component =
+                    ftxui::Container::Vertical(std::move(data.components));
+                auto main_renderer = ftxui::Renderer(component, [&] {
+                    return ftxui::vbox({component->Render()});
+                });
+                screen.Loop(main_renderer);
+                break;
+            }
+            }
         }
     } else {
         std::cout << "-------------------------\n";
