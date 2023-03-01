@@ -38,7 +38,8 @@ enum block_alignment { VERTICAL, HORIZONTAL };
 
 typedef boost::variant<
     nil, boost::recursive_wrapper<button>, boost::recursive_wrapper<input>,
-    boost::recursive_wrapper<slider>, boost::recursive_wrapper<menu>, boost::recursive_wrapper<expression>>
+    boost::recursive_wrapper<slider>, boost::recursive_wrapper<menu>,
+    boost::recursive_wrapper<expression>>
     node;
 
 struct button {
