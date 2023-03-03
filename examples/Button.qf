@@ -1,20 +1,23 @@
 Vertical{
     Button{
-        "Increment",
-        "Increment"
+        "Button1",
+        "Exit",
+        Option{
+                "Animated"
+        }
     }
     Button{
         "Button2",
-        "Exit"
-    }
-    Horizontal{
-        Button{
-            "Button3",
-            "Exit"
+        "Exit",
+        Option{
+                "Simple"
         }
-        Button{
-            "Button4",
-            "Exit"
+    }
+    Button{
+        "Button3",
+        "Exit",
+        Option{
+                "Ascii"
         }
     }
 }

@@ -50,6 +50,7 @@ typedef boost::variant<
 struct button {
     std::string placeholder;
     std::string func;
+    std::string opt;
 };
 
 struct input {
@@ -89,7 +90,7 @@ inline std::ostream &operator<<(std::ostream &out, nil) {
 
 // print function for debugging
 inline std::ostream &operator<<(std::ostream &out, button b) {
-    out << "Placeholder: " << b.placeholder << " | Func: " << b.func;
+    out << "Placeholder: " << b.placeholder << " | Func: " << b.func << "Option:" << b.opt;
     return out;
 }
 
@@ -124,6 +125,7 @@ inline std::ostream &operator<<(std::ostream &out, slider b) {
 BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::button,
                           (std::string, placeholder)
                           (std::string, func)
+                          (std::string, opt)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::input,
@@ -173,6 +175,8 @@ void tab(int indent) {
 struct component_meta_data {
     ftxui::ScreenInteractive *screen;
     ftxui::Components components;
+    ftxui::ButtonOption *options;
+    
 };
 
 struct ast_printer {
@@ -217,9 +221,23 @@ struct node_printer : boost::static_visitor<> {
         std::cout << "button: " << text << std::endl;
 
         if (text.func == "Exit") {
+
+            if(text.opt == "Animated")
+            {
             data->components.push_back(ftxui::Button(
-                text.placeholder, data->screen->ExitLoopClosure()));
+                text.placeholder, data->screen->ExitLoopClosure(), data->options->Animated()));
+            }
+            else if(text.opt == ""|| text.opt == "Simple") {
+                data->components.push_back(ftxui::Button(
+                text.placeholder, data->screen->ExitLoopClosure(), data->options->Simple()));
+            }
+            else if(text.opt == "Ascii") {
+                data->components.push_back(ftxui::Button(
+                text.placeholder, data->screen->ExitLoopClosure(), data->options->Ascii()));
+            }
+
         }
+
     }
 
     void operator()(quick_ftxui_ast::slider const &text) const {
@@ -320,8 +338,9 @@ struct parser
 
         quoted_string %= qi::lexeme['"' >> +(char_ - '"') >> '"'];
 
-        button_comp %= qi::lit("Button") >> '{' >> quoted_string >> ',' >>
-                       quoted_string >> '}';
+         button_comp %=  qi::lit("Button") >> '{' >> quoted_string >> ',' >>
+                         quoted_string >> ',' >> qi::lit("Option") >> '{' >> quoted_string >> '}' >> '}' |
+                         qi::lit("Button") >> '{' >> quoted_string >> ',' >> quoted_string >> '}' ;
 
         input_comp %= qi::lit("Input") >> '{' >> quoted_string >> ',' >>
                       quoted_string >> ',' >> quoted_string >> '}';
