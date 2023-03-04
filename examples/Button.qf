@@ -3,21 +3,21 @@ Vertical{
         "Button1",
         "Exit",
         Option{
-                "Animated"
+                Simple
         }
     }
     Button{
         "Button2",
         "Exit",
         Option{
-                "Simple"
+                Animated
         }
     }
     Button{
         "Button3",
         "Exit",
         Option{
-                "Ascii"
+                Ascii
         }
     }
 }

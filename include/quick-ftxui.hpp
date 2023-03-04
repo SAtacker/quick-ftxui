@@ -38,6 +38,7 @@ struct slider;
 struct check;
 
 enum block_alignment { VERTICAL, HORIZONTAL };
+enum button_option { Ascii, Animated, Simple};
 
 typedef boost::variant<
     nil, boost::recursive_wrapper<button>, boost::recursive_wrapper<input>,
@@ -50,7 +51,7 @@ typedef boost::variant<
 struct button {
     std::string placeholder;
     std::string func;
-    std::string opt;
+    button_option opt;
 };
 
 struct input {
@@ -90,7 +91,7 @@ inline std::ostream &operator<<(std::ostream &out, nil) {
 
 // print function for debugging
 inline std::ostream &operator<<(std::ostream &out, button b) {
-    out << "Placeholder: " << b.placeholder << " | Func: " << b.func << "Option:" << b.opt;
+    out << "Placeholder: " << b.placeholder << " | Func: " << b.func;
     return out;
 }
 
@@ -122,10 +123,11 @@ inline std::ostream &operator<<(std::ostream &out, slider b) {
 } // namespace client
 
 // clang-format off
+
 BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::button,
                           (std::string, placeholder)
                           (std::string, func)
-                          (std::string, opt)
+                          (client::quick_ftxui_ast::button_option, opt)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::input,
@@ -222,19 +224,26 @@ struct node_printer : boost::static_visitor<> {
 
         if (text.func == "Exit") {
 
-            if(text.opt == "Animated")
-            {
+        switch (text.opt) {
+        case quick_ftxui_ast::button_option::Ascii: {
+            data->components.push_back(ftxui::Button(
+                text.placeholder, data->screen->ExitLoopClosure(), data->options->Ascii()));
+            break;
+        }
+        case quick_ftxui_ast::button_option::Animated: {
             data->components.push_back(ftxui::Button(
                 text.placeholder, data->screen->ExitLoopClosure(), data->options->Animated()));
-            }
-            else if(text.opt == ""|| text.opt == "Simple") {
-                data->components.push_back(ftxui::Button(
+            break;
+        }
+        case quick_ftxui_ast::button_option::Simple: {
+            data->components.push_back(ftxui::Button(
                 text.placeholder, data->screen->ExitLoopClosure(), data->options->Simple()));
-            }
-            else if(text.opt == "Ascii") {
-                data->components.push_back(ftxui::Button(
-                text.placeholder, data->screen->ExitLoopClosure(), data->options->Ascii()));
-            }
+            break;
+        }
+        default:
+            throw std::runtime_error("Should never reach here");
+            break;
+        }
 
         }
 
@@ -261,9 +270,7 @@ struct node_printer : boost::static_visitor<> {
 
     void operator()(quick_ftxui_ast::check const &text) const {
         tab(indent + tabsize);
-        int n;
-        std::cout << "Enter the number of options: ";
-        std::cin>>n;
+        int n=10;
         std::cout << "checkbox: " << text << std::endl;
         for(int i = 0; i<n; i++)
             data->components.push_back(ftxui::Checkbox(&text.label_c[i], (bool *)&text.states[i]));
@@ -334,13 +341,19 @@ struct parser
           ("Vertical", quick_ftxui_ast::block_alignment::VERTICAL)
           ("Horizontal", quick_ftxui_ast::block_alignment::HORIZONTAL)
           ;
+
+        buttonopt_kw
+          .add
+          ("Ascii", quick_ftxui_ast::button_option::Ascii)
+          ("Animated", quick_ftxui_ast::button_option::Animated)
+          ("Simple", quick_ftxui_ast::button_option::Simple)
+          ;
         // clang-format on
 
         quoted_string %= qi::lexeme['"' >> +(char_ - '"') >> '"'];
 
-         button_comp %=  qi::lit("Button") >> '{' >> quoted_string >> ',' >>
-                         quoted_string >> ',' >> qi::lit("Option") >> '{' >> quoted_string >> '}' >> '}' |
-                         qi::lit("Button") >> '{' >> quoted_string >> ',' >> quoted_string >> '}' ;
+        button_comp %=  qi::lit("Button") >> '{' >> quoted_string >> ',' >>
+                         quoted_string >> ',' >> qi::lit("Option") >> '{' >> buttonopt_kw >> '}' >> '}' ;
 
         input_comp %= qi::lit("Input") >> '{' >> quoted_string >> ',' >>
                       quoted_string >> ',' >> quoted_string >> '}';
@@ -372,10 +385,12 @@ struct parser
         toggle_comp;
     qi::rule<Iterator, quick_ftxui_ast::input(), ascii::space_type> input_comp;
     qi::rule<Iterator, std::string(), ascii::space_type> quoted_string;
+    qi::rule<Iterator, ftxui::ButtonOption(), ascii::space_type> button_option;
     qi::rule<Iterator, quick_ftxui_ast::slider(), ascii::space_type>
         slider_comp;
     qi::rule<Iterator, quick_ftxui_ast::check(), ascii::space_type> check_comp;
     qi::symbols<char, quick_ftxui_ast::block_alignment> alignment_kw;
+    qi::symbols<char, quick_ftxui_ast::button_option> buttonopt_kw;
 };
 } // namespace quick_ftxui_parser
 
