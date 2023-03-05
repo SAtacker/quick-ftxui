@@ -18,7 +18,9 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
+using namespace std;
 namespace client {
 namespace qi = boost::spirit::qi;
 namespace ascii = boost::spirit::ascii;
@@ -32,12 +34,14 @@ struct button;
 struct expression;
 struct input;
 struct slider;
+struct toggle;
 
 enum block_alignment { VERTICAL, HORIZONTAL };
 
 typedef boost::variant<
     nil, boost::recursive_wrapper<button>, boost::recursive_wrapper<input>,
-    boost::recursive_wrapper<slider>, boost::recursive_wrapper<expression>>
+    boost::recursive_wrapper<slider>, boost::recursive_wrapper<toggle>,
+    boost::recursive_wrapper<expression>>
     node;
 
 struct button {
@@ -57,6 +61,11 @@ struct slider {
     int min;
     int max;
     int increment;
+};
+
+struct toggle {
+    std::vector<std::string> entries;
+    int selected;
 };
 
 struct expression {
@@ -111,6 +120,11 @@ BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::slider,
                           (int, min)
                           (int, max)
                           (int, increment)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::toggle,
+                          (std::vector <std::string> , entries)
+                          (int, selected)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::expression,
@@ -191,6 +205,12 @@ struct node_printer : boost::static_visitor<> {
         data->components.push_back(ftxui::Slider(text.label,
                                                  (int *)(&text.value), text.min,
                                                  text.max, text.increment));
+    }
+
+    void operator()(quick_ftxui_ast::toggle const &text) const {
+        tab(indent + tabsize);
+        data->components.push_back(
+            ftxui::Toggle(&text.entries, (int *)&text.selected));
     }
 
     void operator()(quick_ftxui_ast::input const &text) const {
@@ -276,7 +296,11 @@ struct parser
                        qi::int_ >> ',' >> qi::int_ >> ',' >> qi::int_ >> ',' >>
                        qi::int_ >> '}';
 
-        node = button_comp | input_comp | slider_comp | expression;
+        toggle_comp %= qi::lit("Toggle") >> '{' >> '[' >> *quoted_string >>
+                       ']' >> ',' >> qi::int_ >> '}';
+
+        node =
+            button_comp | input_comp | slider_comp | toggle_comp | expression;
 
         expression = alignment_kw >> '{' >> *node >> '}';
 
@@ -292,6 +316,8 @@ struct parser
     qi::rule<Iterator, quick_ftxui_ast::button(), ascii::space_type>
         button_comp;
     qi::rule<Iterator, quick_ftxui_ast::input(), ascii::space_type> input_comp;
+    qi::rule<Iterator, quick_ftxui_ast::toggle(), ascii::space_type>
+        toggle_comp;
     qi::rule<Iterator, std::string(), ascii::space_type> quoted_string;
     qi::rule<Iterator, quick_ftxui_ast::slider(), ascii::space_type>
         slider_comp;

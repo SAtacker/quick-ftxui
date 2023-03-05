@@ -19,23 +19,35 @@ auto parse_helper(std::string &&str) {
 }
 
 TEST_CASE("Parse Simple") {
-    //expect pass
+    // expect pass
     REQUIRE(parse_helper("Vertical{Button{\"amool\",\"bmpp\"}}"));
     REQUIRE(parse_helper("Horizontal{Button{\"amool\",\"bmpp\"}}"));
 
     REQUIRE(parse_helper("Vertical{Slider{\"amool\", 2, 5, 100, 1}}"));
     REQUIRE(parse_helper("Horizontal{Slider{\"amool\", 2, 5, 100, 1}}"));
 
-    REQUIRE(parse_helper("Horizontal{           Button{          \"amool\"    ,       "
-                         "\"bmpp\" }           }"));
-    REQUIRE(parse_helper("Vertical{           Button{          \"amool\"    ,       "
-                         "\"bmpp\" }           }"));
+    REQUIRE(parse_helper("Vertical{Toggle{[" Opt1 " " Opt2 "], 1}}"));
+    REQUIRE(parse_helper("Horizontal{Toggle{[" Opt1 " " Opt2 "], 1}}"));
+    REQUIRE(parse_helper("Vertical{Toggle{[" Opt1 " " Opt2 "], 0}}"));
+    REQUIRE(parse_helper("Horizontal{Toggle{[" Opt1 " " Opt2 "], 0}}"));
 
-    //expect fail
+    REQUIRE(parse_helper(
+        "Horizontal{           Button{          \"amool\"    ,       "
+        "\"bmpp\" }           }"));
+    REQUIRE(parse_helper(
+        "Vertical{           Button{          \"amool\"    ,       "
+        "\"bmpp\" }           }"));
+
+    // expect fail
     REQUIRE(!parse_helper("\"amool\"{Button{\"amool\",\"bmpp\"}}"));
     REQUIRE(!parse_helper("\"amool\"{_Button{\"amool\",\"bmpp\"}}"));
     REQUIRE(!parse_helper("Vertical{_Button{\"amool\",\"bmpp\"}_}"));
-    REQUIRE(!parse_helper("Vertical{Slider{\"amool\",\"bmpp\",\"cmqq\",\"dmrr\",\"emss\"}}"));
+    REQUIRE(!parse_helper(
+        "Vertical{Slider{\"amool\",\"bmpp\",\"cmqq\",\"dmrr\",\"emss\"}}"));
+    REQUIRE(parse_helper("Vertical{Toggle{[" Opt1 " " Opt2 " " Opt3 "], 1}}"));
+    REQUIRE(parse_helper("Vertical{Toggle{[" Opt1 " " Opt2 " " Opt3 " " Opt4
+                         "], 1}}"));
+    REQUIRE(parse_helper("Vertical{Toggle{[" Opt1 " " Opt2 "], 8}}"));
     REQUIRE(!parse_helper("Horizontal_{_Button{\"amool\",\"bmpp\"}_}"));
     REQUIRE(!parse_helper("\"amool\"{Button{\"amool,\"bmpp\"}}"));
     REQUIRE(!parse_helper("Vertical{Button{\"amool\" . \"bmpp\"}}"));
@@ -104,7 +116,7 @@ TEST_CASE("Parse Recursive") {
             Button{\"amool\",\"bmpp\"}          \
         }\
         }"));
-    
+
     REQUIRE(!parse_helper("Vertical{\
         Button{\"amool\",\"bmpp\"  }             \
             Button{\"amool\",\"bmpp\"}          \
