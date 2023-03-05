@@ -20,7 +20,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
 namespace client {
 namespace qi = boost::spirit::qi;
 namespace ascii = boost::spirit::ascii;
