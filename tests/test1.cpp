@@ -19,26 +19,31 @@ auto parse_helper(std::string &&str) {
 }
 
 TEST_CASE("Parse Simple") {
-    //expect pass
+    // expect pass
     REQUIRE(parse_helper("Vertical{Button{\"amool\",\"bmpp\"}}"));
     REQUIRE(parse_helper("Horizontal{Button{\"amool\",\"bmpp\"}}"));
 
     REQUIRE(parse_helper("Vertical{Slider{\"amool\", 2, 5, 100, 1}}"));
     REQUIRE(parse_helper("Horizontal{Slider{\"amool\", 2, 5, 100, 1}}"));
 
-    REQUIRE(parse_helper("Horizontal{           Button{          \"amool\"    ,       "
-                         "\"bmpp\" }           }"));
-    REQUIRE(parse_helper("Vertical{           Button{          \"amool\"    ,       "
-                         "\"bmpp\" }           }"));
+    REQUIRE(parse_helper(
+        "Horizontal{           Button{          \"amool\"    ,       "
+        "\"bmpp\" }           }"));
+    REQUIRE(parse_helper(
+        "Vertical{           Button{          \"amool\"    ,       "
+        "\"bmpp\" }           }"));
 
-    REQUIRE(parse_helper("Vertical{Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}}"));
-    REQUIRE(parse_helper("Horizontal{Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}}"));  
+    REQUIRE(parse_helper("Vertical{Menu{[ " Physics "  " Maths "  " Chemistry
+                         "  " Biology "] , 0}}"));
+    REQUIRE(parse_helper("Horizontal{Menu{[ " Physics "  " Maths "  " Chemistry
+                         "  " Biology "], 0}}"));
 
-    //expect fail
+    // expect fail
     REQUIRE(!parse_helper("\"amool\"{Button{\"amool\",\"bmpp\"}}"));
     REQUIRE(!parse_helper("\"amool\"{_Button{\"amool\",\"bmpp\"}}"));
     REQUIRE(!parse_helper("Vertical{_Button{\"amool\",\"bmpp\"}_}"));
-    REQUIRE(!parse_helper("Vertical{Slider{\"amool\",\"bmpp\",\"cmqq\",\"dmrr\",\"emss\"}}"));
+    REQUIRE(!parse_helper(
+        "Vertical{Slider{\"amool\",\"bmpp\",\"cmqq\",\"dmrr\",\"emss\"}}"));
     REQUIRE(!parse_helper("Horizontal_{_Button{\"amool\",\"bmpp\"}_}"));
     REQUIRE(!parse_helper("\"amool\"{Button{\"amool,\"bmpp\"}}"));
     REQUIRE(!parse_helper("Vertical{Button{\"amool\" . \"bmpp\"}}"));
@@ -81,7 +86,7 @@ TEST_CASE("Parse Multiple Components in any order") {
     REQUIRE(parse_helper("Vertical{\
         Slider{\"amool\" , 20, 1, 100, 1}  \
         Button{\"amool\" , \"bmpp\"}  \
-        Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}  \
+        Menu{[ " Physics "  " Maths "  " Chemistry "  " Biology "], 0}  \
         }"));
 }
 
@@ -93,7 +98,7 @@ TEST_CASE("Parse Recursive") {
         Horizontal{\
             Slider{\"amool\", 40, 1, 100, 10}  \
             Slider{\"amool\", 10, 1, 200, 100}  \
-            Menu{\"[ "Physics"  "Maths"  "Chemistry"  "Biology"]\",\"0\"}  \
+            Menu{[ " Physics "  " Maths "  " Chemistry "  " Biology "], 0}  \
             Vertical{\
                 Button{\"amool\",\"bmpp\"}  \
                 Button{\"amool\",\"bmpp\"}  \
@@ -113,7 +118,7 @@ TEST_CASE("Parse Recursive") {
             Button{\"amool\",\"bmpp\"}          \
         }\
         }"));
-    
+
     REQUIRE(!parse_helper("Vertical{\
         Button{\"amool\",\"bmpp\"  }             \
             Button{\"amool\",\"bmpp\"}          \
