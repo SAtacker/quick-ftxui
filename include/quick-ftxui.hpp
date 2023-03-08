@@ -245,7 +245,7 @@ struct node_printer : boost::static_visitor<> {
             break;
         }
 
-        }
+      }
 
     }
 
@@ -353,7 +353,7 @@ struct parser
         quoted_string %= qi::lexeme['"' >> +(char_ - '"') >> '"'];
 
         button_comp %=  qi::lit("Button") >> '{' >> quoted_string >> ',' >>
-                         quoted_string >> ',' >> qi::lit("Option") >> '{' >> buttonopt_kw >> '}' >> '}' ;
+                         quoted_string >> ',' >> buttonopt_kw >> '}' ;
 
         input_comp %= qi::lit("Input") >> '{' >> quoted_string >> ',' >>
                       quoted_string >> ',' >> quoted_string >> '}';
@@ -385,7 +385,6 @@ struct parser
         toggle_comp;
     qi::rule<Iterator, quick_ftxui_ast::input(), ascii::space_type> input_comp;
     qi::rule<Iterator, std::string(), ascii::space_type> quoted_string;
-    qi::rule<Iterator, ftxui::ButtonOption(), ascii::space_type> button_option;
     qi::rule<Iterator, quick_ftxui_ast::slider(), ascii::space_type>
         slider_comp;
     qi::rule<Iterator, quick_ftxui_ast::check(), ascii::space_type> check_comp;
