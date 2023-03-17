@@ -33,10 +33,10 @@ TEST_CASE("Parse Simple") {
         "Vertical{           Button{          \"amool\"    ,       "
         "\"bmpp\" }           }"));
 
-    REQUIRE(parse_helper("Vertical{Menu{[ " Physics "  " Maths "  " Chemistry
-                         "  " Biology "] , 0}}"));
-    REQUIRE(parse_helper("Horizontal{Menu{[ " Physics "  " Maths "  " Chemistry
-                         "  " Biology "], 0}}"));
+    REQUIRE(parse_helper("Vertical{Menu{[\"Physics\"  \"Maths\"  \"Chemistry\" "
+                         " \"Biology\"], 0}}"));
+    REQUIRE(parse_helper("Horizontal{Menu{[\"Physics\"  \"Maths\"  "
+                         "\"Chemistry\"  \"Biology\"], 0}}"));
 
     // expect fail
     REQUIRE(!parse_helper("\"amool\"{Button{\"amool\",\"bmpp\"}}"));
