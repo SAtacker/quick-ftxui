@@ -1,0 +1,11 @@
+Vertical
+{
+    Menu{
+        [ "Physics"  "Maths"  "Chemistry"  "Biology"],
+        0
+    }
+    Button{
+        "Button2",
+        "Exit"
+    }
+}
