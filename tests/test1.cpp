@@ -36,6 +36,7 @@ TEST_CASE("Parse Simple") {
                          "\"bmpp\" }           }"));
 
     //expect fail
+    REQUIRE(!parse_helper("\"amool\"{Button{\"amool\",\"bmpp\",\"cmqq\"}}"));
     REQUIRE(!parse_helper("\"amool\"{Button{\"amool\",\"bmpp\",Ascii}}"));
     REQUIRE(!parse_helper("\"amool\"{_Button{\"amool\",\"bmpp\",Ascii}"));
     REQUIRE(!parse_helper("Vertical{_Button{\"amool\",\"bmpp\",Ascii}_}"));
