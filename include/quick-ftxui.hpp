@@ -33,18 +33,14 @@ struct nil {};
 struct button;
 struct expression;
 struct input;
-struct toggle;
 struct slider;
-struct check;
 
 enum block_alignment { VERTICAL, HORIZONTAL };
 enum button_option { Ascii, Animated, Simple};
 
 typedef boost::variant<
     nil, boost::recursive_wrapper<button>, boost::recursive_wrapper<input>,
-                       boost::recursive_wrapper<toggle>,
     boost::recursive_wrapper<slider>,
-    boost::recursive_wrapper<check>,
     boost::recursive_wrapper<expression>>
     node;
 
@@ -60,11 +56,6 @@ struct input {
     std::string option;
 };
 
-struct toggle{
-    std::vector<std::string> entries_t;
-    int selected_t;
-};
-
 struct slider {
     std::string label;
     int value;
@@ -76,11 +67,6 @@ struct slider {
 struct expression {
     block_alignment align;
     std::list<node> expr;
-};
-
-struct check {
-    std::vector<std::string> label_c;
-    std::vector<int> states;
 };
 
 // print function for debugging
@@ -99,16 +85,6 @@ inline std::ostream &operator<<(std::ostream &out, button b) {
 inline std::ostream &operator<<(std::ostream &out, input b) {
     out << "Placeholder: " << b.placeholder << " | Temp: " << b.temp
         << " | Options: " << b.option;
-    return out;
-}
-
-// print function for debugging
-inline std::ostream &operator<<(std::ostream &out, toggle b) {
-    out << "Entry: " << b.entries_t[0] << b.entries_t[1] << " Selected: " << b.selected_t;
-    return out;
-}
-
-inline std::ostream &operator<<(std::ostream &out, check b) {
     return out;
 }
 
@@ -149,15 +125,6 @@ BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::expression,
                           (std::list<client::quick_ftxui_ast::node>, expr)
 )
 
-BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::toggle,
-                          (std::vector<std::string>, entries_t)
-                          (int, selected_t)
-)
-
-BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::check,
-                          (std::vector<std::string>, label_c)
-                          (std::vector<int>, states)                        
-)
 // clang-format on
 
 namespace client {
@@ -260,22 +227,7 @@ struct node_printer : boost::static_visitor<> {
     void operator()(quick_ftxui_ast::input const &text) const {
         tab(indent + tabsize);
         std::cout << "input: " << text << std::endl;
-    }
-
-    void operator()(quick_ftxui_ast::toggle const &text) const {
-        tab(indent + tabsize);
-        std::cout << "toggle: " << text << std::endl;
-        data->components.push_back(ftxui::Toggle(&text.entries_t, (int*)&text.selected_t));
-    }
-
-    void operator()(quick_ftxui_ast::check const &text) const {
-        tab(indent + tabsize);
-        int n=10;
-        std::cout << "checkbox: " << text << std::endl;
-        for(int i = 0; i<n; i++)
-            data->components.push_back(ftxui::Checkbox(&text.label_c[i], (bool *)&text.states[i]));
-    }
-    
+    }    
 
     void operator()(quick_ftxui_ast::nil const &text) const {
         tab(indent + tabsize);
@@ -358,15 +310,11 @@ struct parser
         input_comp %= qi::lit("Input") >> '{' >> quoted_string >> ',' >>
                       quoted_string >> ',' >> quoted_string >> '}';
 
-        toggle_comp %= qi::lit("Toggle") >> '{' >> '(' >> +quoted_string >> ')' >> ',' >> qi::int_ >> '}';
-
         slider_comp %= qi::lit("Slider") >> '{' >> quoted_string >> ',' >>
                        qi::int_ >> ',' >> qi::int_ >> ',' >> qi::int_ >> ',' >>
                        qi::int_ >> '}';
 
-        check_comp %= qi::lit("Checkbox") >> '{' >> '[' >> *quoted_string  >> ']' >> ',' >> qi::int_ >> '}';
-
-        node = button_comp | input_comp | toggle_comp | slider_comp | check_comp | expression;
+        node = button_comp | input_comp | slider_comp | expression;
 
         expression = alignment_kw >> '{' >> *node >> '}';
 
@@ -374,20 +322,17 @@ struct parser
         BOOST_SPIRIT_DEBUG_NODES((button_comp)(expression));
 
         // Error handling
-        on_error<fail>(toggle_comp, error_handler(_4, _3, _2));
+        on_error<fail>(button_comp, error_handler(_4, _3, _2));
     }
     qi::rule<Iterator, quick_ftxui_ast::expression(), ascii::space_type>
         expression;
     qi::rule<Iterator, quick_ftxui_ast::node(), ascii::space_type> node;
     qi::rule<Iterator, quick_ftxui_ast::button(), ascii::space_type>
         button_comp;
-    qi::rule<Iterator, quick_ftxui_ast::toggle(), ascii::space_type>
-        toggle_comp;
     qi::rule<Iterator, quick_ftxui_ast::input(), ascii::space_type> input_comp;
     qi::rule<Iterator, std::string(), ascii::space_type> quoted_string;
     qi::rule<Iterator, quick_ftxui_ast::slider(), ascii::space_type>
         slider_comp;
-    qi::rule<Iterator, quick_ftxui_ast::check(), ascii::space_type> check_comp;
     qi::symbols<char, quick_ftxui_ast::block_alignment> alignment_kw;
     qi::symbols<char, quick_ftxui_ast::button_option> buttonopt_kw;
 };
