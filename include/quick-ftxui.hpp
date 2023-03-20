@@ -15,11 +15,9 @@
 #include "ftxui/dom/elements.hpp" // for text, hbox, separator, Element, operator|, vbox, border
 #include "ftxui/screen/screen.hpp"
 #include "ftxui/util/ref.hpp" // for Ref
-#include "ftxui/component/captured_mouse.hpp" 
 
 #include <iostream>
 #include <string>
-#include <vector>
 
 namespace client {
 namespace qi = boost::spirit::qi;
