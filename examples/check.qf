@@ -1,6 +1,0 @@
-Vertical{
-    Checkbox{
-        ["math" "bio" "phy" "chem" "english" ],
-        0
-    }
-}

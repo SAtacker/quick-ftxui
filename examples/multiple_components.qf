@@ -1,7 +1,8 @@
 Vertical{
     Button{
         "arg1",
-        "Exit"
+        "Exit",
+        Animated
     }
     Slider{
         "arg2",
@@ -13,7 +14,8 @@ Vertical{
     Horizontal{
         Button{
             "arg3",
-            "Exit"
+            "Exit",
+            Ascii
         }
         Slider{
             "arg4",
@@ -22,9 +24,5 @@ Vertical{
             100,
             5
         }
-        Toggle{
-        ("yes" "no"),
-        1
-    }
     }
 }

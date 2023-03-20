@@ -1,6 +1,0 @@
-Vertical{
-    Toggle{
-        ("math" "bio" "phy" "chem" "english" ),
-        0
-    }
-}
