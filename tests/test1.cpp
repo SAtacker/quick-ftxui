@@ -113,7 +113,7 @@ TEST_CASE("Parse Recursive") {
     // expect fail
     REQUIRE(!parse_helper("Vertical{\
         Button{\"amool\",\"bmpp\",Ascii               \
-            Button{\"amool\",\"bmpp\",Animated}          \
+            Button{\"amool\",\"bmpp\",\"cmqq\"}          \
         }\
         }"));
 
