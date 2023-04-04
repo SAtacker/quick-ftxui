@@ -32,10 +32,10 @@ TEST_CASE("Parse Simple") {
 
     REQUIRE(parse_helper(
         "Horizontal{           Button{          \"amool\"    ,       "
-        "\"bmpp\" }           }"));
+        "\"bmpp\"    ,       Simple }           }"));
     REQUIRE(parse_helper(
         "Vertical{           Button{          \"amool\"    ,       "
-        "\"bmpp\" }           }"));
+        "\"bmpp\"    ,       Simple }           }"));
 
     REQUIRE(parse_helper("Vertical{Menu{[\"Physics\"  \"Maths\"  \"Chemistry\" "
                          " \"Biology\"], 0}}"));

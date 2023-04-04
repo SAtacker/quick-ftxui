@@ -35,11 +35,11 @@ struct slider;
 struct menu;
 
 enum block_alignment { VERTICAL, HORIZONTAL };
-enum button_option { Ascii, Animated, Simple};
+enum button_option { Ascii, Animated, Simple };
 
 typedef boost::variant<
     nil, boost::recursive_wrapper<button>, boost::recursive_wrapper<input>,
-    boost::recursive_wrapper<slider>,boost::recursive_wrapper<menu>,
+    boost::recursive_wrapper<slider>, boost::recursive_wrapper<menu>,
     boost::recursive_wrapper<expression>>
     node;
 
@@ -153,8 +153,7 @@ void tab(int indent) {
 struct component_meta_data {
     ftxui::ScreenInteractive *screen;
     ftxui::Components components;
-    ftxui::ButtonOption *options;
-    
+    ftxui::ButtonOption *options;     
 };
 
 struct ast_printer {
@@ -199,30 +198,27 @@ struct node_printer : boost::static_visitor<> {
         std::cout << "button: " << text << std::endl;
 
         if (text.func == "Exit") {
-
-        switch (text.opt) {
-        case quick_ftxui_ast::button_option::Ascii: {
-            data->components.push_back(ftxui::Button(
-                text.placeholder, data->screen->ExitLoopClosure(), data->options->Ascii()));
-            break;
+            switch (text.opt) {
+            case quick_ftxui_ast::button_option::Ascii: {
+                data->components.push_back(
+                    ftxui::Button(text.placeholder, data->screen->ExitLoopClosure(), data->options->Ascii()));
+                break;
+            }
+            case quick_ftxui_ast::button_option::Animated: {
+                data->components.push_back(
+                    ftxui::Button(text.placeholder, data->screen->ExitLoopClosure(), data->options->Animated()));
+                break;
+            }
+            case quick_ftxui_ast::button_option::Simple: {
+                data->components.push_back(
+                    ftxui::Button(text.placeholder, data->screen->ExitLoopClosure(), data->options->Simple()));
+                break;
+            }
+            default:
+                throw std::runtime_error("Should never reach here");
+                break;
+            }
         }
-        case quick_ftxui_ast::button_option::Animated: {
-            data->components.push_back(ftxui::Button(
-                text.placeholder, data->screen->ExitLoopClosure(), data->options->Animated()));
-            break;
-        }
-        case quick_ftxui_ast::button_option::Simple: {
-            data->components.push_back(ftxui::Button(
-                text.placeholder, data->screen->ExitLoopClosure(), data->options->Simple()));
-            break;
-        }
-        default:
-            throw std::runtime_error("Should never reach here");
-            break;
-        }
-
-      }
-
     }
 
     void operator()(quick_ftxui_ast::slider const &text) const {
@@ -319,8 +315,8 @@ struct parser
 
         quoted_string %= qi::lexeme['"' >> +(char_ - '"') >> '"'];
 
-        button_comp %=  qi::lit("Button") >> '{' >> quoted_string >> ',' >>
-                         quoted_string >> ',' >> buttonopt_kw >> '}' ;
+        button_comp %= qi::lit("Button") >> '{' >> quoted_string >> ',' >>
+                       quoted_string >> ',' >> buttonopt_kw >> '}';
 
         input_comp %= qi::lit("Input") >> '{' >> quoted_string >> ',' >>
                       quoted_string >> ',' >> quoted_string >> '}';
@@ -360,4 +356,3 @@ struct parser
 } // namespace client
 
 #endif // QUICK_FTXUI_HPP
-
