@@ -153,7 +153,7 @@ void tab(int indent) {
 struct component_meta_data {
     ftxui::ScreenInteractive *screen;
     ftxui::Components components;
-    ftxui::ButtonOption *options;     
+    ftxui::ButtonOption *options;
 };
 
 struct ast_printer {
@@ -200,18 +200,21 @@ struct node_printer : boost::static_visitor<> {
         if (text.func == "Exit") {
             switch (text.opt) {
             case quick_ftxui_ast::button_option::Ascii: {
-                data->components.push_back(
-                    ftxui::Button(text.placeholder, data->screen->ExitLoopClosure(), data->options->Ascii()));
+                data->components.push_back(ftxui::Button(
+                    text.placeholder, data->screen->ExitLoopClosure(),
+                    data->options->Ascii()));
                 break;
             }
             case quick_ftxui_ast::button_option::Animated: {
-                data->components.push_back(
-                    ftxui::Button(text.placeholder, data->screen->ExitLoopClosure(), data->options->Animated()));
+                data->components.push_back(ftxui::Button(
+                    text.placeholder, data->screen->ExitLoopClosure(),
+                    data->options->Animated()));
                 break;
             }
             case quick_ftxui_ast::button_option::Simple: {
-                data->components.push_back(
-                    ftxui::Button(text.placeholder, data->screen->ExitLoopClosure(), data->options->Simple()));
+                data->components.push_back(ftxui::Button(
+                    text.placeholder, data->screen->ExitLoopClosure(),
+                    data->options->Simple()));
                 break;
             }
             default:
@@ -232,7 +235,7 @@ struct node_printer : boost::static_visitor<> {
     void operator()(quick_ftxui_ast::input const &text) const {
         tab(indent + tabsize);
         std::cout << "input: " << text << std::endl;
-    }    
+    }
 
     void operator()(quick_ftxui_ast::menu const &text) const {
         tab(indent + tabsize);
