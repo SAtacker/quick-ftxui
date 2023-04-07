@@ -37,6 +37,10 @@ TEST_CASE("Parse Simple") {
                          " \"Biology\"], 0}}"));
     REQUIRE(parse_helper("Horizontal{Menu{[\"Physics\"  \"Maths\"  "
                          "\"Chemistry\"  \"Biology\"], 0}}"));
+    REQUIRE(parse_helper("Vertical{Toggle{[\"Opt1\" \"Opt2\"], 1}}"));
+    REQUIRE(parse_helper("Horizontal{Toggle{[\"Opt1\" \"Opt2\"], 1}}"));
+    REQUIRE(parse_helper("Vertical{Toggle{[\"Opt1\" \"Opt2\"], 0}}"));
+    REQUIRE(parse_helper("Horizontal{Toggle{[\"Opt1\" \"Opt2\"], 0}}"));
 
     // expect fail
     REQUIRE(!parse_helper("\"amool\"{Button{\"amool\",\"bmpp\"}}"));
@@ -47,6 +51,8 @@ TEST_CASE("Parse Simple") {
     REQUIRE(!parse_helper("Horizontal_{_Button{\"amool\",\"bmpp\"}_}"));
     REQUIRE(!parse_helper("\"amool\"{Button{\"amool,\"bmpp\"}}"));
     REQUIRE(!parse_helper("Vertical{Button{\"amool\" . \"bmpp\"}}"));
+    REQUIRE(parse_helper("Vertical{Toggle{[\"Opt1\" \"Opt2\"], 3}}"));
+    REQUIRE(parse_helper("Vertical{Toggle{[\"Opt1\" \"Opt2\"], 8}}"));
 }
 
 TEST_CASE("Parse Complex") {
