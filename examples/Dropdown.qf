@@ -1,0 +1,13 @@
+Vertical{
+    Dropdown{
+        [ "Physics"  "Maths"  "Chemistry"  "Biology"],
+        0
+    }
+    Slider{
+        "Slider 1: ",
+        50,
+        0,
+        100,
+        1
+    }
+}
