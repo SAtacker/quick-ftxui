@@ -17,8 +17,7 @@ Vertical{
         }
         Button{
             "Button4",
-            "Exit",
-            Simple
+            "Exit"
         }
     }
 }

@@ -23,9 +23,11 @@ TEST_CASE("Parse Simple") {
     REQUIRE(parse_helper("Vertical{Button{\"amool\",\"bmpp\",Ascii}}"));
     REQUIRE(parse_helper("Vertical{Button{\"amool\",\"bmpp\",Simple}}"));
     REQUIRE(parse_helper("Vertical{Button{\"amool\",\"bmpp\",Animated}}"));
+    REQUIRE(parse_helper("Vertical{Button{\"amool\",\"bmpp\"}}"));
     REQUIRE(parse_helper("Horizontal{Button{\"amool\",\"bmpp\",Ascii}}"));
     REQUIRE(parse_helper("Horizontal{Button{\"amool\",\"bmpp\",Simple}}"));
     REQUIRE(parse_helper("Horizontal{Button{\"amool\",\"bmpp\",Animated}}"));
+    REQUIRE(parse_helper("Horizontal{Button{\"amool\",\"bmpp\"}}"));
 
     REQUIRE(parse_helper("Vertical{Slider{\"amool\", 2, 5, 100, 1}}"));
     REQUIRE(parse_helper("Horizontal{Slider{\"amool\", 2, 5, 100, 1}}"));

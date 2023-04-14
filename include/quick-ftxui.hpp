@@ -35,7 +35,7 @@ struct slider;
 struct menu;
 
 enum block_alignment { VERTICAL, HORIZONTAL };
-enum button_option { Ascii, Animated, Simple };
+enum button_option { Ascii, Animated, Simple, NoOpt };
 
 typedef boost::variant<
     nil, boost::recursive_wrapper<button>, boost::recursive_wrapper<input>,
@@ -46,7 +46,7 @@ typedef boost::variant<
 struct button {
     std::string placeholder;
     std::string func;
-    button_option opt;
+    button_option opt = button_option::NoOpt;
 };
 
 struct input {
@@ -217,6 +217,12 @@ struct node_printer : boost::static_visitor<> {
                     data->options->Simple()));
                 break;
             }
+            case quick_ftxui_ast::button_option::NoOpt: {
+                data->components.push_back(ftxui::Button(
+                    text.placeholder, data->screen->ExitLoopClosure(),
+                    data->options->Simple()));
+                break;
+            }
             default:
                 throw std::runtime_error("Should never reach here");
                 break;
@@ -319,7 +325,7 @@ struct parser
         quoted_string %= qi::lexeme['"' >> +(char_ - '"') >> '"'];
 
         button_comp %= qi::lit("Button") >> '{' >> quoted_string >> ',' >>
-                       quoted_string >> ',' >> buttonopt_kw >> '}';
+                       quoted_string >> -(',' >> buttonopt_kw) >> '}';
 
         input_comp %= qi::lit("Input") >> '{' >> quoted_string >> ',' >>
                       quoted_string >> ',' >> quoted_string >> '}';

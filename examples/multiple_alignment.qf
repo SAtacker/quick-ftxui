@@ -12,8 +12,7 @@ Horizontal{
     Vertical{
         Button{
             "Button3",
-            "Exit",
-            Simple
+            "Exit"
         }
         Button{
             "Button4",
@@ -28,8 +27,7 @@ Horizontal{
             }
             Button{
                 "Button6",
-                "Exit",
-                Simple
+                "Exit"
             }
         }
     }
@@ -41,8 +39,7 @@ Horizontal{
         }
         Button{
             "Button8",
-            "Exit",
-            Simple
+            "Exit"
         }
     }
 }
