@@ -1,24 +1,20 @@
 Vertical{
     Button{
         "Button1",
-        "Exit",
-        Simple
+        "Exit"
     }
     Button{
         "Button2",
-        "Exit",
-        Animated
+        "Exit"
     }
     Horizontal{
         Button{
             "Button3",
-            "Exit",
-            Ascii
+            "Exit"
         }
         Button{
             "Button4",
-            "Exit",
-            Simple
+            "Exit"
         }
     }
 }

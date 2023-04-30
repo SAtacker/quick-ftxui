@@ -2,12 +2,25 @@ Vertical
 {
     Menu{
         [ "Physics"  "Maths"  "Chemistry"  "Biology"],
+        0
+    }
+    Menu{
+        [ "Physics"  "Maths"  "Chemistry"  "Biology"],
         0,
         Vertical_Animated
     }
+    Menu{
+        [ "Computers"  "History"  "Geography"  "English"],
+        0,
+        Horizontal_Animated
+    }
+    Menu{
+        [ "Computers"  "History"  "Geography"  "English"],
+        0,
+        Toggle
+    }
     Button{
         "Button2",
-        "Exit",
-        Simple
+        "Exit"
     }
 }

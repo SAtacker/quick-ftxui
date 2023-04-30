@@ -6,7 +6,6 @@
 #include <iostream>
 
 int main(int argc, char **argv) {
-
     typedef std::string::const_iterator iterator_type;
     typedef client::quick_ftxui_parser::parser<iterator_type> parser;
     typedef client::quick_ftxui_ast::expression expression_type;
@@ -73,6 +72,6 @@ int main(int argc, char **argv) {
         std::cout << "-------------------------\n";
         std::cout << "Parsing failed\n";
         std::cout << "-------------------------\n";
-    }    
+    }
     return 0;
 }
