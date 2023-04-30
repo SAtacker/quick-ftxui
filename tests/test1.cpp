@@ -23,19 +23,21 @@ TEST_CASE("Parse Simple") {
     REQUIRE(parse_helper("Vertical{Button{\"amool\",\"bmpp\",Ascii}}"));
     REQUIRE(parse_helper("Vertical{Button{\"amool\",\"bmpp\",Simple}}"));
     REQUIRE(parse_helper("Vertical{Button{\"amool\",\"bmpp\",Animated}}"));
+    REQUIRE(parse_helper("Vertical{Button{\"amool\",\"bmpp\"}}"));
     REQUIRE(parse_helper("Horizontal{Button{\"amool\",\"bmpp\",Ascii}}"));
     REQUIRE(parse_helper("Horizontal{Button{\"amool\",\"bmpp\",Simple}}"));
     REQUIRE(parse_helper("Horizontal{Button{\"amool\",\"bmpp\",Animated}}"));
+    REQUIRE(parse_helper("Horizontal{Button{\"amool\",\"bmpp\"}}"));
 
     REQUIRE(parse_helper("Vertical{Slider{\"amool\", 2, 5, 100, 1}}"));
     REQUIRE(parse_helper("Horizontal{Slider{\"amool\", 2, 5, 100, 1}}"));
 
     REQUIRE(parse_helper(
         "Horizontal{           Button{          \"amool\"    ,       "
-        "\"bmpp\" }           }"));
+        "\"bmpp\"    ,       Simple }           }"));
     REQUIRE(parse_helper(
         "Vertical{           Button{          \"amool\"    ,       "
-        "\"bmpp\" }           }"));
+        "\"bmpp\"    ,       Simple }           }"));
 
     REQUIRE(parse_helper("Vertical{Menu{[\"Physics\"  \"Maths\"  \"Chemistry\" "
                          " \"Biology\"], 0}}"));
@@ -46,7 +48,6 @@ TEST_CASE("Parse Simple") {
     REQUIRE(parse_helper("Vertical{Toggle{[\"Opt1\" \"Opt2\"], 0}}"));
     REQUIRE(parse_helper("Horizontal{Toggle{[\"Opt1\" \"Opt2\"], 0}}"));
 
-<<<<<<< HEAD
     //expect fail
     REQUIRE(!parse_helper("\"amool\"{Button{\"amool\",\"bmpp\",\"cmqq\"}}"));
     REQUIRE(!parse_helper("\"amool\"{Button{\"amool\",\"bmpp\",Ascii}}"));
@@ -56,19 +57,8 @@ TEST_CASE("Parse Simple") {
     REQUIRE(!parse_helper("Horizontal_{_Button{\"amool\",\"bmpp\",Simple}_}"));
     REQUIRE(!parse_helper("\"amool\"{Button{\"amool,\"bmpp\",Simple}}"));
     REQUIRE(!parse_helper("Vertical{Button{\"amool\" . \"bmpp\" . Ascii}}"));
-=======
-    // expect fail
-    REQUIRE(!parse_helper("\"amool\"{Button{\"amool\",\"bmpp\"}}"));
-    REQUIRE(!parse_helper("\"amool\"{_Button{\"amool\",\"bmpp\"}}"));
-    REQUIRE(!parse_helper("Vertical{_Button{\"amool\",\"bmpp\"}_}"));
-    REQUIRE(!parse_helper(
-        "Vertical{Slider{\"amool\",\"bmpp\",\"cmqq\",\"dmrr\",\"emss\"}}"));
-    REQUIRE(!parse_helper("Horizontal_{_Button{\"amool\",\"bmpp\"}_}"));
-    REQUIRE(!parse_helper("\"amool\"{Button{\"amool,\"bmpp\"}}"));
-    REQUIRE(!parse_helper("Vertical{Button{\"amool\" . \"bmpp\"}}"));
     REQUIRE(parse_helper("Vertical{Toggle{[\"Opt1\" \"Opt2\"], 3}}"));
     REQUIRE(parse_helper("Vertical{Toggle{[\"Opt1\" \"Opt2\"], 8}}"));
->>>>>>> 9bd76d5eb378cf9ce07ef8ed14ec230383baf96d
 }
 
 TEST_CASE("Parse Complex") {
@@ -131,7 +121,7 @@ TEST_CASE("Parse Recursive") {
     // expect fail
     REQUIRE(!parse_helper("Vertical{\
         Button{\"amool\",\"bmpp\",Ascii               \
-            Button{\"amool\",\"bmpp\",Animated}          \
+            Button{\"amool\",\"bmpp\",\"cmqq\"}          \
         }\
         }"));
 

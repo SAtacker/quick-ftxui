@@ -2,10 +2,12 @@ Vertical
 {
     Menu{
         [ "Physics"  "Maths"  "Chemistry"  "Biology"],
-        0
+        0,
+        Vertical_Animated
     }
     Button{
         "Button2",
-        "Exit"
+        "Exit",
+        Simple
     }
 }
