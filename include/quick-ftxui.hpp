@@ -36,7 +36,14 @@ struct menu;
 struct toggle;
 
 enum block_alignment { VERTICAL, HORIZONTAL };
-enum menu_option { Horizontal, Horizontal_Animated, Vertical, Vertical_Animated, Toggle, NoOption };
+enum menu_option {
+    Horizontal,
+    Horizontal_Animated,
+    Vertical,
+    Vertical_Animated,
+    Toggle,
+    NoOption
+};
 
 typedef boost::variant<
     nil, boost::recursive_wrapper<button>, boost::recursive_wrapper<input>,
@@ -227,42 +234,48 @@ struct node_printer : boost::static_visitor<> {
 
     void operator()(quick_ftxui_ast::menu const &text) const {
         tab(indent + tabsize);
-        
+
         switch (text.opt) {
-            case quick_ftxui_ast::menu_option::Horizontal: {
-                data->components.push_back(
-            ftxui::Menu(&text.entries, (int *)&text.selected, data->m_options->Horizontal()));
-                break;
-            }
-            case quick_ftxui_ast::menu_option::Horizontal_Animated: {
-                data->components.push_back(
-            ftxui::Menu(&text.entries, (int *)&text.selected, data->m_options->HorizontalAnimated()));
-                break;            
-            }
-            case quick_ftxui_ast::menu_option::Vertical: {
-                data->components.push_back(
-            ftxui::Menu(&text.entries, (int *)&text.selected, data->m_options->Vertical()));
-                break;
-            }
-            case quick_ftxui_ast::menu_option::Vertical_Animated: {
-                data->components.push_back(
-            ftxui::Menu(&text.entries, (int *)&text.selected, data->m_options->VerticalAnimated()));
-                break;
-            }
-            case quick_ftxui_ast::menu_option::Toggle: {
-                data->components.push_back(
-            ftxui::Menu(&text.entries, (int *)&text.selected, data->m_options->Toggle()));
-                break;
-            }
-            case quick_ftxui_ast::menu_option::NoOption: {
-                data->components.push_back(
-            ftxui::Menu(&text.entries, (int *)&text.selected, data->m_options->Vertical()));
-                break;
-            }
-            default:
-                throw std::runtime_error("Should never reach here");
-                break;
-            }
+        case quick_ftxui_ast::menu_option::Horizontal: {
+            data->components.push_back(
+                ftxui::Menu(&text.entries, (int *)&text.selected,
+                            data->m_options->Horizontal()));
+            break;
+        }
+        case quick_ftxui_ast::menu_option::Horizontal_Animated: {
+            data->components.push_back(
+                ftxui::Menu(&text.entries, (int *)&text.selected,
+                            data->m_options->HorizontalAnimated()));
+            break;
+        }
+        case quick_ftxui_ast::menu_option::Vertical: {
+            data->components.push_back(
+                ftxui::Menu(&text.entries, (int *)&text.selected,
+                            data->m_options->Vertical()));
+            break;
+        }
+        case quick_ftxui_ast::menu_option::Vertical_Animated: {
+            data->components.push_back(
+                ftxui::Menu(&text.entries, (int *)&text.selected,
+                            data->m_options->VerticalAnimated()));
+            break;
+        }
+        case quick_ftxui_ast::menu_option::Toggle: {
+            data->components.push_back(ftxui::Menu(&text.entries,
+                                                   (int *)&text.selected,
+                                                   data->m_options->Toggle()));
+            break;
+        }
+        case quick_ftxui_ast::menu_option::NoOption: {
+            data->components.push_back(
+                ftxui::Menu(&text.entries, (int *)&text.selected,
+                            data->m_options->Vertical()));
+            break;
+        }
+        default:
+            throw std::runtime_error("Should never reach here");
+            break;
+        }
     }
 
     void operator()(quick_ftxui_ast::toggle const &text) const {
@@ -359,7 +372,7 @@ struct parser
                        qi::int_ >> '}';
 
         menu_comp %= qi::lit("Menu") >> '{' >> '[' >> *quoted_string >> ']' >>
-                     ',' >> qi::int_ >> -(',' >> menuopt_kw)  >> '}';
+                     ',' >> qi::int_ >> -(',' >> menuopt_kw) >> '}';
 
         toggle_comp %= qi::lit("Toggle") >> '{' >> '[' >> *quoted_string >>
                        ']' >> ',' >> qi::int_ >> '}';
@@ -395,4 +408,3 @@ struct parser
 } // namespace client
 
 #endif // QUICK_FTXUI_HPP
-
