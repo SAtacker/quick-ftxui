@@ -207,16 +207,7 @@ struct node_printer : boost::static_visitor<> {
             data->components.push_back(ftxui::Button(
                 text.placeholder, data->screen->ExitLoopClosure()));
         } else {
-#if defined(__linux__)
-            data->components.push_back(ftxui::Button(text.placeholder, [&] {
-                int pid = getpid();
-                std::string x = text.func + " 2>>/tmp/quick-ftxui-" +
-                                std::to_string(pid) + ".txt 1>&2";
-                const char *str = x.c_str();
-                std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(str, "r"),
-                                                              pclose);
-            }));
-#elif _WIN32
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
             data->components.push_back(ftxui::Button(text.placeholder, [&] {
                 int pid = _getpid();
                 std::string temp_path =
@@ -227,6 +218,18 @@ struct node_printer : boost::static_visitor<> {
                 const char *str = x.c_str();
                 std::unique_ptr<FILE, decltype(&_pclose)> _pipe(
                     _popen(str, "r"), _pclose);
+            }));
+#else
+            data->components.push_back(ftxui::Button(text.placeholder, [&] {
+                int pid = getpid();
+                std::string temp_path =
+                    std::filesystem::temp_directory_path().string();
+                std::string x = text.func + " 2>>" + temp_path +
+                                "/quick-ftxui-" + std::to_string(pid) +
+                                ".txt 1>&2";
+                const char *str = x.c_str();
+                std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(str, "r"),
+                                                              pclose);
             }));
 #endif
         }
