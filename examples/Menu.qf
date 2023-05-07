@@ -6,6 +6,7 @@ Vertical
     }
     Button{
         "Button2",
-        "Exit"
+        "Exit",
+        Animated
     }
 }
