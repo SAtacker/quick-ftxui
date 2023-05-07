@@ -9,6 +9,10 @@ Vertical{
         "Exit",
         Animated
     }
+    Button{
+        "ls",
+        System("ls -l")
+    }
     Horizontal{
         Button{
             "Button3",
