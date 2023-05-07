@@ -402,7 +402,6 @@ struct parser
     qi::rule<Iterator, quick_ftxui_ast::expression(), ascii::space_type>
         expression;
     qi::rule<Iterator, quick_ftxui_ast::node(), ascii::space_type> node;
-    qi::rule<Iterator, std::string(), ascii::space_type> button_function;
     qi::rule<Iterator, quick_ftxui_ast::button(), ascii::space_type>
         button_comp;
     qi::rule<Iterator, quick_ftxui_ast::input(), ascii::space_type> input_comp;
@@ -410,6 +409,7 @@ struct parser
     qi::rule<Iterator, quick_ftxui_ast::toggle(), ascii::space_type>
         toggle_comp;
     qi::rule<Iterator, std::string(), ascii::space_type> quoted_string;
+    qi::rule<Iterator, std::string(), ascii::space_type> button_function;
     qi::rule<Iterator, quick_ftxui_ast::slider(), ascii::space_type>
         slider_comp;
     qi::symbols<char, quick_ftxui_ast::block_alignment> alignment_kw;
