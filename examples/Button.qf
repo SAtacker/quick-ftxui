@@ -4,8 +4,8 @@ Vertical{
         "Exit"
     }
     Button{
-        "Button2",
-        "Exit"
+        "ls",
+        System("ls -l")
     }
     Horizontal{
         Button{
