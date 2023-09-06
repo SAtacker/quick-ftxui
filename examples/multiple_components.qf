@@ -1,28 +1,35 @@
 Vertical{
+    str x
     Button{
-        "arg1",
-        "Exit",
-        Animated
+        "Open firefox",
+        System("/usr/bin/firefox"),
+        Animated,
+        x
     }
-    Slider{
-        "arg2",
-        50,
+    int y = 20
+    Slider {
+        "A Slider",
+        y,
         0,
         100,
         1
     }
-    Horizontal{
-        Button{
-            "arg3",
-            "Exit",
-            Ascii
+    Horizontal {
+        int z = 1
+        int w
+        Dropdown {
+            [ "Zain", "Mahesh", "Alqama", "Vaidic", "Mundane", "Advait", ],
+            z
         }
-        Slider{
-            "arg4",
-            35, 
-            0,
-            100,
-            5
+        Toggle {
+            [ "On", "Off", ],
+            w
         }
+    }
+
+    Button {
+        "Exit",
+        "Exit",
+        Ascii
     }
 }

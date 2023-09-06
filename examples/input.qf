@@ -1,0 +1,24 @@
+Vertical {
+    str f = "John"
+    str l = "Doe"
+    str p
+    Input {
+        "First Name....",
+        Default,
+        f
+    }
+    Input {
+        "Last Name....",
+        Default,
+        l
+    }
+    Input {
+        "Password....",
+        Password,
+        p
+    }
+    Button {
+        "x",
+        "Exit"
+    }
+}

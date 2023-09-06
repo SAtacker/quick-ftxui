@@ -1,0 +1,24 @@
+Vertical
+{
+    int x
+    Menu{
+        [ "Physics", "Maths", "Chemistry", "Biology",],
+        HorizontalAnimated,
+        x
+    }
+    int y
+    int z
+    Toggle {
+        [ "On", "Off", ],
+        y
+    }
+    Dropdown {
+        [ "Zain", "Mahesh", "Alqama", "Vaidic", "Mundane", "Advait", ],
+        z
+    }
+    Button{
+        "Button2",
+        "Exit",
+        Animated
+    }
+}

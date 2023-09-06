@@ -88,8 +88,12 @@ target_link_libraries(quick-ftxui
     PRIVATE ${Boost_LIBRARIES}
     PRIVATE ftxui::screen
     PRIVATE ftxui::dom
-    PRIVATE ftxui::component # Not needed for this example.
+    PRIVATE ftxui::component
 )
+
+if (QUICK_FTXUI_EXAMPLES)
+    add_subdirectory(cpp_examples)
+endif()
 
 if(WIN32)
 else()

@@ -2,4 +2,4 @@
 # http://clang.llvm.org/docs/ClangFormatStyleOptions.html
 BasedOnStyle: LLVM
 Standard: Cpp11
-IndentWidth: 4
+IndentWidth: 2

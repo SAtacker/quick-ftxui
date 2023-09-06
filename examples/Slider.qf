@@ -1,22 +1,25 @@
 Vertical{
+    int x = 5
     Slider{
         "Slider 1: ",
-        50,
+        x,
         0,
         100,
         1
     }
     Horizontal{
+        int y = 40
         Slider{
             "Slider 2: ",
-            10,
+            y,
             0,
             100,
             2
         }
+        int z = 90
         Slider{
             "Slider 3: ",
-            90,
+            z,
             0,
             100,
             5
