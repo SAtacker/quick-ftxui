@@ -25,7 +25,7 @@ int main() {
             100,
             2
         }
-        Button{
+        Magenta Button{
             "ls",
             System("/usr/bin/google-chrome-stable"),
             Ascii,

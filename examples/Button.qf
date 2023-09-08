@@ -4,15 +4,16 @@ Vertical{
     str z = "init"
     str a
     Horizontal {
-        Button {
-        "ls -l",
-        System("ls -l"),
-        Animated,
-        z
+        Red Button {
+            "ls -l",
+            System("ls -l"),
+            Animated,
+            z
         }
-        Button{
+        BlueLight Button{
             "chrome",
             System("/usr/bin/google-chrome-stable"),
+            Ascii,
             z
         }
     }

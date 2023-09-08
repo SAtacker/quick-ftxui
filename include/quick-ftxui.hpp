@@ -55,6 +55,53 @@ enum menu_option {
   VerticalAnimated
 };
 
+enum colours {
+  NoColor,
+  Black,
+  GrayDark,
+  GrayLight,
+  White,
+  Blue,
+  BlueLight,
+  Cyan,
+  CyanLight,
+  Green,
+  GreenLight,
+  Magenta,
+  MagentaLight,
+  Red,
+  RedLight,
+  Yellow,
+  YellowLight
+};
+
+std::map<colours, ftxui::Color> colour_map = {
+    {colours::NoColor, ftxui::Color::Default},
+    {colours::Black, ftxui::Color::Black},
+    {colours::GrayDark, ftxui::Color::GrayDark},
+    {colours::GrayLight, ftxui::Color::GrayLight},
+    {colours::White, ftxui::Color::White},
+    {colours::Blue, ftxui::Color::Blue},
+    {colours::BlueLight, ftxui::Color::BlueLight},
+    {colours::Cyan, ftxui::Color::Cyan},
+    {colours::CyanLight, ftxui::Color::CyanLight},
+    {colours::Green, ftxui::Color::Green},
+    {colours::GreenLight, ftxui::Color::GreenLight},
+    {colours::Magenta, ftxui::Color::Magenta},
+    {colours::MagentaLight, ftxui::Color::MagentaLight},
+    {colours::Red, ftxui::Color::Red},
+    {colours::RedLight, ftxui::Color::RedLight},
+    {colours::Yellow, ftxui::Color::Yellow},
+    {colours::YellowLight, ftxui::Color::YellowLight},
+};
+
+ftxui::Color resolveColour(colours Name) {
+  if (auto It = colour_map.find(Name); It != colour_map.end()) {
+    return It->second;
+  }
+  return ftxui::Color::Default;
+}
+
 typedef boost::variant<
     nil, boost::recursive_wrapper<button>, boost::recursive_wrapper<input>,
     boost::recursive_wrapper<slider>, boost::recursive_wrapper<menu>,
@@ -65,6 +112,7 @@ typedef boost::variant<
     node;
 
 struct button {
+  colours color = colours::NoColor;
   std::string placeholder;
   std::string func;
   button_option opt = button_option::NoOpt;
@@ -124,8 +172,8 @@ inline std::ostream &operator<<(std::ostream &out, nil) {
 
 // print function for debugging
 inline std::ostream &operator<<(std::ostream &out, button b) {
-  out << "Placeholder: " << b.placeholder << " | Func: " << b.func
-      << " | Var: " << b.output;
+  out << "Color: " << b.color << " Placeholder: " << b.placeholder
+      << " | Func: " << b.func << " | Var: " << b.output;
   return out;
 }
 
@@ -157,6 +205,7 @@ inline std::ostream &operator<<(std::ostream &out, str_variable_decl b) {
 // clang-format off
 
 BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::button,
+                          (quick_ftxui_ast::colours, color)
                           (std::string, placeholder)
                           (std::string, func)
                           (quick_ftxui_ast::button_option, opt)
@@ -273,15 +322,16 @@ struct node_printer : boost::static_visitor<> {
     // tab(indent + tabsize);
     // std::cout << "button: " << text << std::endl;
 
-    ftxui::ButtonOption button_opt;
+    ftxui::Color btn_color = quick_ftxui_ast::resolveColour(text.color);
 
+    ftxui::ButtonOption button_opt;
     switch (text.opt) {
     case quick_ftxui_ast::button_option::Ascii: {
       button_opt = ftxui::ButtonOption::Ascii();
       break;
     }
     case quick_ftxui_ast::button_option::Animated: {
-      button_opt = ftxui::ButtonOption::Animated();
+      button_opt = ftxui::ButtonOption::Animated(btn_color);
       break;
     }
     case quick_ftxui_ast::button_option::Simple: {
@@ -298,71 +348,79 @@ struct node_printer : boost::static_visitor<> {
     }
 
     if (text.func == "Exit") {
-      data->components.push_back(ftxui::Button(
-          text.placeholder, data->screen->ExitLoopClosure(), button_opt));
+      data->components.push_back(ftxui::Button(text.placeholder,
+                                               data->screen->ExitLoopClosure(),
+                                               button_opt) |
+                                 ftxui::color(btn_color));
     } else {
       std::string file_op_path;
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-      data->components.push_back(ftxui::Button(
-          text.placeholder,
-          [&] {
-            int pid = _getpid();
-            std::string temp_path =
-                std::filesystem::temp_directory_path().string();
-            std::string x = text.func + " 2>>" + temp_path + "/quick-ftxui-" +
-                            std::to_string(pid) + ".txt 1>&2";
+      data->components.push_back(
+          ftxui::Button(
+              text.placeholder,
+              [&] {
+                int pid = _getpid();
+                std::string temp_path =
+                    std::filesystem::temp_directory_path().string();
+                std::string x = text.func + " 2>>" + temp_path +
+                                "/quick-ftxui-" + std::to_string(pid) +
+                                ".txt 1>&2";
 
-            {
-              // Direct stdout & sterr to a temp file
-              std::unique_ptr<FILE, decltype(&_pclose)> _pipe(
-                  _popen(x.c_str(), "r"), _pclose);
-            }
-            if (auto It =
-                    quick_ftxui_ast::strings.find(std::string(text.output));
-                It != quick_ftxui_ast::strings.end()) {
-              std::fstream f(temp_path + "/quick-ftxui-" + std::to_string(pid) +
-                             ".txt");
-              std::string str((std::istreambuf_iterator<char>(f)),
-                              std::istreambuf_iterator<char>());
+                {
+                  // Direct stdout & sterr to a temp file
+                  std::unique_ptr<FILE, decltype(&_pclose)> _pipe(
+                      _popen(x.c_str(), "r"), _pclose);
+                }
+                if (auto It =
+                        quick_ftxui_ast::strings.find(std::string(text.output));
+                    It != quick_ftxui_ast::strings.end()) {
+                  std::fstream f(temp_path + "/quick-ftxui-" +
+                                 std::to_string(pid) + ".txt");
+                  std::string str((std::istreambuf_iterator<char>(f)),
+                                  std::istreambuf_iterator<char>());
 
-              quick_ftxui_ast::strings[It->first] = str;
-            } else {
-              throw std::runtime_error("Variable " + text.output +
-                                       " not found");
-            }
-          },
-          button_opt));
+                  quick_ftxui_ast::strings[It->first] = str;
+                } else {
+                  throw std::runtime_error("Variable " + text.output +
+                                           " not found");
+                }
+              },
+              button_opt) |
+          ftxui::color(btn_color));
 
 #elif defined(__linux__) || defined(__APPLE__)
-      data->components.push_back(ftxui::Button(
-          text.placeholder,
-          [&] {
-            int pid = getpid();
-            std::string temp_path =
-                std::filesystem::temp_directory_path().string();
-            std::string x = text.func + " 2>>" + temp_path + "/quick-ftxui-" +
-                            std::to_string(pid) + ".txt 1>&2";
+      data->components.push_back(
+          ftxui::Button(
+              text.placeholder,
+              [&] {
+                int pid = getpid();
+                std::string temp_path =
+                    std::filesystem::temp_directory_path().string();
+                std::string x = text.func + " 2>>" + temp_path +
+                                "/quick-ftxui-" + std::to_string(pid) +
+                                ".txt 1>&2";
 
-            {
-              // Direct stdout & sterr to a temp file
-              std::unique_ptr<FILE, decltype(&pclose)> pipe(
-                  popen(x.c_str(), "r"), pclose);
-            }
-            if (auto It =
-                    quick_ftxui_ast::strings.find(std::string(text.output));
-                It != quick_ftxui_ast::strings.end()) {
-              std::fstream f(temp_path + "/quick-ftxui-" + std::to_string(pid) +
-                             ".txt");
-              std::string str((std::istreambuf_iterator<char>(f)),
-                              std::istreambuf_iterator<char>());
+                {
+                  // Direct stdout & sterr to a temp file
+                  std::unique_ptr<FILE, decltype(&pclose)> pipe(
+                      popen(x.c_str(), "r"), pclose);
+                }
+                if (auto It =
+                        quick_ftxui_ast::strings.find(std::string(text.output));
+                    It != quick_ftxui_ast::strings.end()) {
+                  std::fstream f(temp_path + "/quick-ftxui-" +
+                                 std::to_string(pid) + ".txt");
+                  std::string str((std::istreambuf_iterator<char>(f)),
+                                  std::istreambuf_iterator<char>());
 
-              quick_ftxui_ast::strings[It->first] = str;
-            } else {
-              throw std::runtime_error("Variable " + text.output +
-                                       " not found");
-            }
-          },
-          button_opt));
+                  quick_ftxui_ast::strings[It->first] = str;
+                } else {
+                  throw std::runtime_error("Variable " + text.output +
+                                           " not found");
+                }
+              },
+              button_opt) |
+          ftxui::color(btn_color));
 #else
       throw std::runtime_error(
           "System Architecture not detected, system calls unavailable");
@@ -574,6 +632,27 @@ struct parser
           ("Vertical", quick_ftxui_ast::menu_option::Vertical)
           ("VerticalAnimated", quick_ftxui_ast::menu_option::VerticalAnimated)
           ;
+
+        color_kw
+          .add
+          ("None", quick_ftxui_ast::colours::NoColor)
+          ("Black", quick_ftxui_ast::colours::Black)
+          ("GrayDark", quick_ftxui_ast::colours::GrayDark)
+          ("GrayLight", quick_ftxui_ast::colours::GrayLight)
+          ("White", quick_ftxui_ast::colours::White)
+          ("Blue", quick_ftxui_ast::colours::Blue)
+          ("BlueLight", quick_ftxui_ast::colours::BlueLight)
+          ("Cyan", quick_ftxui_ast::colours::Cyan)
+          ("CyanLight", quick_ftxui_ast::colours::CyanLight)
+          ("Green", quick_ftxui_ast::colours::Green)
+          ("GreenLight", quick_ftxui_ast::colours::GreenLight)
+          ("Magenta", quick_ftxui_ast::colours::Magenta)
+          ("MagentaLight", quick_ftxui_ast::colours::MagentaLight)
+          ("Red", quick_ftxui_ast::colours::Red)
+          ("RedLight", quick_ftxui_ast::colours::RedLight)
+          ("Yellow", quick_ftxui_ast::colours::Yellow)
+          ("YellowLight", quick_ftxui_ast::colours::YellowLight)
+          ;
     // clang-format on
 
     quoted_string %= qi::lexeme['"' >> +(char_ - '"') >> '"'];
@@ -584,8 +663,8 @@ struct parser
     button_function =
         qi::lit("System") >> "(" >> quoted_string >> ")" | quoted_string;
 
-    button_comp %= qi::lit("Button") >> '{' >> quoted_string >> ',' >>
-                   button_function >> -(',' >> buttonopt_kw) >>
+    button_comp %= -(color_kw) >> qi::lit("Button") >> '{' >> quoted_string >>
+                   ',' >> button_function >> -(',' >> buttonopt_kw) >>
                    -(',' >> identifier) >> '}';
 
     input_comp %= qi::lit("Input") >> '{' >> quoted_string >>
@@ -640,6 +719,7 @@ struct parser
   qi::symbols<char, quick_ftxui_ast::button_option> buttonopt_kw;
   qi::symbols<char, quick_ftxui_ast::input_option> inputopt_kw;
   qi::symbols<char, quick_ftxui_ast::menu_option> menuopt_kw;
+  qi::symbols<char, quick_ftxui_ast::colours> color_kw;
 };
 
 void parse_qf(std::string source_code) {
