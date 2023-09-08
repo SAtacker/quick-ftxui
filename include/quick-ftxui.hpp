@@ -126,6 +126,7 @@ struct input {
 };
 
 struct slider {
+  colours color = colours::NoColor;
   std::string label;
   std::string value;
   int min;
@@ -219,6 +220,7 @@ BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::input,
 )
 
 BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::slider,
+                          (quick_ftxui_ast::colours, color)
                           (std::string, label)
                           (std::string, value)
                           (int, min)
@@ -434,9 +436,17 @@ struct node_printer : boost::static_visitor<> {
 
     if (auto It = quick_ftxui_ast::numbers.find(std::string(text.value));
         It != quick_ftxui_ast::numbers.end()) {
-      data->components.push_back(ftxui::Slider(text.label, (int *)(&It->second),
-                                               text.min, text.max,
-                                               text.increment));
+      ftxui::SliderOption<int> slider_opt;
+      slider_opt.value = (int *)(&It->second);
+      slider_opt.min = text.min, slider_opt.max = text.max,
+      slider_opt.increment = text.increment;
+      slider_opt.color_active = resolveColour(text.color),
+      slider_opt.color_inactive = ftxui::Color::GrayDark;
+      auto sldr = ftxui::Slider<int>(slider_opt);
+      auto with_label = ftxui::Renderer(sldr, [sldr, &text] {
+        return ftxui::hbox({ftxui::text(text.label), sldr->Render()});
+      });
+      data->components.push_back(with_label);
     } else {
       throw std::runtime_error("Variable " + text.value + " not found");
     }
@@ -670,9 +680,9 @@ struct parser
     input_comp %= qi::lit("Input") >> '{' >> quoted_string >>
                   -(',' >> inputopt_kw) >> ',' >> identifier >> '}';
 
-    slider_comp %= qi::lit("Slider") >> '{' >> quoted_string >> ',' >>
-                   identifier >> ',' >> qi::int_ >> ',' >> qi::int_ >> ',' >>
-                   qi::int_ >> '}';
+    slider_comp %= -(color_kw) >> qi::lit("Slider") >> '{' >> quoted_string >>
+                   ',' >> identifier >> ',' >> qi::int_ >> ',' >> qi::int_ >>
+                   ',' >> qi::int_ >> '}';
 
     menu_comp %= qi::lit("Menu") >> '{' >> '[' >> +(quoted_string >> ',') >>
                  ']' >> -(',' >> menuopt_kw) >> ',' >> identifier >> '}';

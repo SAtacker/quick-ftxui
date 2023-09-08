@@ -1,35 +1,23 @@
 Vertical{
     int x = 5
-    Slider{
+    Blue Slider{
         "Slider 1: ",
         x,
         0,
         100,
         1
     }
-    Horizontal{
-        int y = 40
-        Slider{
-            "Slider 2: ",
-            y,
-            0,
-            100,
-            2
-        }
-        int z = 90
-        Slider{
-            "Slider 3: ",
-            z,
-            0,
-            100,
-            5
-        }
+    int y = 40
+    YellowLight Slider{
+        "Slider 2: ",
+        y,
+        0,
+        100,
+        2
     }
-    Horizontal{
-        Button{
-            "Exit",
-            "Exit",
-            Animated
-        }
+    White Button{
+        "Exit",
+        "Exit",
+        Animated
     }
 }

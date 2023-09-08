@@ -18,7 +18,7 @@ int main() {
             Password,
             y
         }
-        Slider {
+        RedLight Slider {
             "Test: ",
             x,
             0,
