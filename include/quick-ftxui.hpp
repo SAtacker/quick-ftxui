@@ -143,11 +143,13 @@ struct menu {
 };
 
 struct toggle {
+  colours color = colours::Default;
   std::vector<std::string> entries;
   std::string selected;
 };
 
 struct dropdown {
+  colours color = colours::Default;
   std::vector<std::string> entries;
   std::string selected;
 };
@@ -239,11 +241,13 @@ BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::menu,
 )
 
 BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::toggle,
+                          (quick_ftxui_ast::colours, color)
                           (std::vector <std::string> , entries)
                           (std::string, selected)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::dropdown,
+                          (quick_ftxui_ast::colours, color)
                           (std::vector <std::string> , entries)
                           (std::string, selected)
 )
@@ -525,10 +529,14 @@ struct node_printer : boost::static_visitor<> {
 
   void operator()(quick_ftxui_ast::toggle const &text) const {
     // tab(indent + tabsize);
+
+    ftxui::Color toggle_clr = quick_ftxui_ast::resolveColour(text.color);
+
     if (auto It = quick_ftxui_ast::numbers.find(std::string(text.selected));
         It != quick_ftxui_ast::numbers.end()) {
       data->components.push_back(
-          ftxui::Toggle(&text.entries, (int *)(&It->second)));
+          ftxui::Toggle(&text.entries, (int *)(&It->second)) |
+          ftxui::color(toggle_clr));
     } else {
       throw std::runtime_error("Variable " + text.selected + " not found");
     }
@@ -536,10 +544,14 @@ struct node_printer : boost::static_visitor<> {
 
   void operator()(quick_ftxui_ast::dropdown const &text) const {
     // tab(indent + tabsize);
+
+    ftxui::Color drpdwn_clr = quick_ftxui_ast::resolveColour(text.color);
+
     if (auto It = quick_ftxui_ast::numbers.find(std::string(text.selected));
         It != quick_ftxui_ast::numbers.end()) {
       data->components.push_back(
-          ftxui::Dropdown(&text.entries, (int *)(&It->second)));
+          ftxui::Dropdown(&text.entries, (int *)(&It->second)) |
+          ftxui::color(drpdwn_clr));
     } else {
       throw std::runtime_error("Variable " + text.selected + " not found");
     }
@@ -696,10 +708,10 @@ struct parser
                  +(quoted_string >> ',') >> ']' >> -(',' >> menuopt_kw) >>
                  ',' >> identifier >> '}';
 
-    toggle_comp %= qi::lit("Toggle") >> '{' >> '[' >> +(quoted_string >> ',') >>
-                   ']' >> ',' >> identifier >> '}';
+    toggle_comp %= -(color_kw) >> qi::lit("Toggle") >> '{' >> '[' >>
+                   +(quoted_string >> ',') >> ']' >> ',' >> identifier >> '}';
 
-    drpdwn_comp %= qi::lit("Dropdown") >> '{' >> '[' >>
+    drpdwn_comp %= -(color_kw) >> qi::lit("Dropdown") >> '{' >> '[' >>
                    +(quoted_string >> ',') >> ']' >> ',' >> identifier >> '}';
 
     int_var_decl %= qi::lit("int") >> identifier >> -('=' > qi::int_);

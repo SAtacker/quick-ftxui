@@ -1,7 +1,7 @@
 Vertical
 {
     int x
-    Blue Menu{
+    Red Menu{
         [ "Physics", "Maths", "Chemistry", "Biology",],
         HorizontalAnimated,
         x
@@ -14,11 +14,11 @@ Vertical
     }
     int y
     int z
-    Toggle {
+    Cyan Toggle {
         [ "On", "Off", ],
         y
     }
-    Dropdown {
+    BlueLight Dropdown {
         [ "Zain", "Mahesh", "Alqama", "Vaidic", "Mundane", "Advait", ],
         z
     }
