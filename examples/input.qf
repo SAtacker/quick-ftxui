@@ -2,17 +2,17 @@ Vertical {
     str f = "John"
     str l = "Doe"
     str p
-    Input {
+    GreenLight Input {
         "First Name....",
-        Default,
+        None,
         f
     }
-    Input {
+    BlueLight Input {
         "Last Name....",
-        Default,
+        None,
         l
     }
-    Input {
+    Red Input {
         "Password....",
         Password,
         p

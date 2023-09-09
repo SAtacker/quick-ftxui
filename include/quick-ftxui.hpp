@@ -46,7 +46,7 @@ struct str_variable_decl;
 
 enum block_alignment { VERTICAL, HORIZONTAL };
 enum button_option { Ascii, Animated, Simple, NoOpt };
-enum input_option { None, Password, Default };
+enum input_option { None, Password };
 enum menu_option {
   NoMenuOption,
   Horizontal,
@@ -56,7 +56,7 @@ enum menu_option {
 };
 
 enum colours {
-  NoColor,
+  Default,
   Black,
   GrayDark,
   GrayLight,
@@ -76,7 +76,7 @@ enum colours {
 };
 
 std::map<colours, ftxui::Color> colour_map = {
-    {colours::NoColor, ftxui::Color::Default},
+    {colours::Default, ftxui::Color::Default},
     {colours::Black, ftxui::Color::Black},
     {colours::GrayDark, ftxui::Color::GrayDark},
     {colours::GrayLight, ftxui::Color::GrayLight},
@@ -112,7 +112,7 @@ typedef boost::variant<
     node;
 
 struct button {
-  colours color = colours::NoColor;
+  colours color = colours::Default;
   std::string placeholder;
   std::string func;
   button_option opt = button_option::NoOpt;
@@ -120,13 +120,14 @@ struct button {
 };
 
 struct input {
+  colours color = colours::Default;
   std::string placeholder;
   input_option opt = input_option::None;
   std::string value;
 };
 
 struct slider {
-  colours color = colours::NoColor;
+  colours color = colours::Default;
   std::string label;
   std::string value;
   int min;
@@ -135,6 +136,7 @@ struct slider {
 };
 
 struct menu {
+  colours color = colours::Default;
   std::vector<std::string> entries;
   menu_option opt = menu_option::NoMenuOption;
   std::string selected;
@@ -214,6 +216,7 @@ BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::button,
 )
 
 BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::input,
+                          (quick_ftxui_ast::colours, color)
                           (std::string, placeholder)
                           (quick_ftxui_ast::input_option, opt)
                           (std::string, value)
@@ -229,6 +232,7 @@ BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::slider,
 )
 
 BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::menu,
+                          (quick_ftxui_ast::colours, color)
                           (std::vector<std::string>, entries)
                           (quick_ftxui_ast::menu_option, opt)
                           (std::string, selected)
@@ -459,16 +463,18 @@ struct node_printer : boost::static_visitor<> {
     if (auto It = quick_ftxui_ast::strings.find(std::string(text.value));
         It != quick_ftxui_ast::strings.end()) {
       ftxui::InputOption pass;
+      ftxui::Color input_clr = quick_ftxui_ast::resolveColour(text.color);
       switch (text.opt) {
-      case quick_ftxui_ast::input_option::Default:
       case quick_ftxui_ast::input_option::None:
-        data->components.push_back(ftxui::Input(&It->second, text.placeholder));
+        data->components.push_back(ftxui::Input(&It->second, text.placeholder) |
+                                   ftxui::color(input_clr));
         break;
 
       case quick_ftxui_ast::input_option::Password:
         pass.password = true;
         data->components.push_back(
-            ftxui::Input(&It->second, text.placeholder, pass));
+            ftxui::Input(&It->second, text.placeholder, pass) |
+            ftxui::color(input_clr));
         break;
       default:
         throw std::runtime_error("Should never reach here");
@@ -482,8 +488,9 @@ struct node_printer : boost::static_visitor<> {
   void operator()(quick_ftxui_ast::menu const &text) const {
     // tab(indent + tabsize);
 
-    ftxui::MenuOption option;
+    ftxui::Color menu_clr = quick_ftxui_ast::resolveColour(text.color);
 
+    ftxui::MenuOption option;
     switch (text.opt) {
     case quick_ftxui_ast::menu_option::NoMenuOption:
     case quick_ftxui_ast::menu_option::Horizontal:
@@ -509,7 +516,8 @@ struct node_printer : boost::static_visitor<> {
     if (auto It = quick_ftxui_ast::numbers.find(std::string(text.selected));
         It != quick_ftxui_ast::numbers.end()) {
       data->components.push_back(
-          ftxui::Menu(&text.entries, (int *)(&It->second), option));
+          ftxui::Menu(&text.entries, (int *)(&It->second), option) |
+          ftxui::color(menu_clr));
     } else {
       throw std::runtime_error("Variable " + text.selected + " not found");
     }
@@ -631,7 +639,7 @@ struct parser
 
         inputopt_kw
           .add
-          ("Default", quick_ftxui_ast::input_option::Default)
+          ("None", quick_ftxui_ast::input_option::None)
           ("Password", quick_ftxui_ast::input_option::Password)
           ;
         
@@ -645,7 +653,7 @@ struct parser
 
         color_kw
           .add
-          ("None", quick_ftxui_ast::colours::NoColor)
+          ("Default", quick_ftxui_ast::colours::Default)
           ("Black", quick_ftxui_ast::colours::Black)
           ("GrayDark", quick_ftxui_ast::colours::GrayDark)
           ("GrayLight", quick_ftxui_ast::colours::GrayLight)
@@ -677,15 +685,16 @@ struct parser
                    ',' >> button_function >> -(',' >> buttonopt_kw) >>
                    -(',' >> identifier) >> '}';
 
-    input_comp %= qi::lit("Input") >> '{' >> quoted_string >>
+    input_comp %= -(color_kw) >> qi::lit("Input") >> '{' >> quoted_string >>
                   -(',' >> inputopt_kw) >> ',' >> identifier >> '}';
 
     slider_comp %= -(color_kw) >> qi::lit("Slider") >> '{' >> quoted_string >>
                    ',' >> identifier >> ',' >> qi::int_ >> ',' >> qi::int_ >>
                    ',' >> qi::int_ >> '}';
 
-    menu_comp %= qi::lit("Menu") >> '{' >> '[' >> +(quoted_string >> ',') >>
-                 ']' >> -(',' >> menuopt_kw) >> ',' >> identifier >> '}';
+    menu_comp %= -(color_kw) >> qi::lit("Menu") >> '{' >> '[' >>
+                 +(quoted_string >> ',') >> ']' >> -(',' >> menuopt_kw) >>
+                 ',' >> identifier >> '}';
 
     toggle_comp %= qi::lit("Toggle") >> '{' >> '[' >> +(quoted_string >> ',') >>
                    ']' >> ',' >> identifier >> '}';

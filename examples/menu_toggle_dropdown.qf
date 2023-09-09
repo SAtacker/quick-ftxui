@@ -1,10 +1,16 @@
 Vertical
 {
     int x
-    Menu{
+    Blue Menu{
         [ "Physics", "Maths", "Chemistry", "Biology",],
         HorizontalAnimated,
         x
+    }
+    int a
+    Green Menu {
+        [ "Physics", "Maths", "Chemistry", "Biology",],
+        Vertical,
+        a
     }
     int y
     int z
