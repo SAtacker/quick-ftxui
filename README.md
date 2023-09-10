@@ -11,14 +11,14 @@ It converts this JSON-like [code](./examples/multiple_components.qf) into a TUI
 ```
 Vertical{
     str x
-    Button{
+    Blue Button{
         "Open firefox",
         System("/usr/bin/firefox"),
         Animated,
         x
     }
     int y = 20
-    Slider {
+    Yellow Slider {
         "A Slider",
         y,
         0,
@@ -28,17 +28,17 @@ Vertical{
     Horizontal {
         int z = 1
         int w
-        Dropdown {
+        Red Dropdown {
             [ "Zain", "Mahesh", "Alqama", "Vaidic", "Mundane", "Advait", ],
             z
         }
-        Toggle {
+        Cyan Toggle {
             [ "On", "Off", ],
             w
         }
     }
 
-    Button {
+    RedLight Button {
         "Exit",
         "Exit",
         Ascii
@@ -48,8 +48,7 @@ Vertical{
 
 ### Output
 
-https://github.com/vrnimje/quick-ftxui/assets/103848930/0bc3b98d-a85f-415f-b002-9f15894a9ce2
-
+https://github.com/vrnimje/quick-ftxui/assets/103848930/c0d92edb-79fe-434d-9d72-0a577f617ed5
 
 ## Features
 * #### Supports majority of FTXUI components, listed below:
@@ -188,7 +187,7 @@ ninja
 
 ## Roadmap for v0.2 release
 
-- [ ] Adding color (component wise)
+- [x] Adding color (component wise)
 - [ ] Adding FTXUI DOM elements (e.g. seperator)
 - [ ] Adding a way to use C++ defined variables directly, instead of depending on script-variables 
 - [ ] Adding detailed user documentation

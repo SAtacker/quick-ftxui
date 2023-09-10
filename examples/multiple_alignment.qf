@@ -1,10 +1,10 @@
 Horizontal{
-    Button{
+    Red Button{
         "Button1",
         "Exit",
         Simple
     }
-    Button{
+    Yellow Button{
         "Button2",
         "Exit",
         Animated
