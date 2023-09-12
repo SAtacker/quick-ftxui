@@ -10,6 +10,7 @@ Vertical{
             Animated,
             z
         }
+        separator
         BlueLight Button{
             "chrome",
             System("/usr/bin/google-chrome-stable"),
@@ -17,6 +18,8 @@ Vertical{
             z
         }
     }
+    Heavy separator
+    text("This button exits the TUI")
     Button {
         "Exit",
         "Exit"

@@ -34,6 +34,8 @@ std::map<std::string, std::string> strings;
 //  The AST
 ///////////////////////////////////////////////////////////////////////////
 struct nil {};
+struct dom_text;
+struct separator;
 struct button;
 struct expression;
 struct input;
@@ -47,6 +49,7 @@ struct str_variable_decl;
 enum block_alignment { VERTICAL, HORIZONTAL };
 enum button_option { Ascii, Animated, Simple, NoOpt };
 enum input_option { None, Password };
+enum sep_style { Normal, Light, Dashed, Double, Heavy };
 enum menu_option {
   NoMenuOption,
   Horizontal,
@@ -106,7 +109,8 @@ typedef boost::variant<
     nil, boost::recursive_wrapper<button>, boost::recursive_wrapper<input>,
     boost::recursive_wrapper<slider>, boost::recursive_wrapper<menu>,
     boost::recursive_wrapper<toggle>, boost::recursive_wrapper<dropdown>,
-    boost::recursive_wrapper<expression>,
+    boost::recursive_wrapper<expression>, boost::recursive_wrapper<dom_text>,
+    boost::recursive_wrapper<separator>,
     boost::recursive_wrapper<int_variable_decl>,
     boost::recursive_wrapper<str_variable_decl>>
     node;
@@ -152,6 +156,15 @@ struct dropdown {
   colours color = colours::Default;
   std::vector<std::string> entries;
   std::string selected;
+};
+
+struct dom_text {
+  colours color = colours::Default;
+  std::string content = "";
+};
+
+struct separator {
+  sep_style style = sep_style::Normal;
 };
 
 struct int_variable_decl {
@@ -250,6 +263,15 @@ BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::dropdown,
                           (quick_ftxui_ast::colours, color)
                           (std::vector <std::string> , entries)
                           (std::string, selected)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::dom_text,
+                          (quick_ftxui_ast::colours, color)
+                          (std::string, content)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::separator,
+                          (quick_ftxui_ast::sep_style, style)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::int_variable_decl,
@@ -562,6 +584,48 @@ struct node_printer : boost::static_visitor<> {
     // std::cout << "nil: \"" << text << '"' << std::endl;
   }
 
+  void operator()(quick_ftxui_ast::dom_text const &text) const {
+    // tab(indent + tabsize);
+    // std::cout << "nil: \"" << text << '"' << std::endl;
+    data->components.push_back(ftxui::Renderer([&] {
+      return (ftxui::text(text.content) |
+              ftxui::color(quick_ftxui_ast::resolveColour(text.color)));
+    }));
+  }
+
+  void operator()(quick_ftxui_ast::separator const &text) const {
+    // tab(indent + tabsize);
+    // std::cout << "nil: \"" << text << '"' << std::endl;
+    // clang-format off
+    switch (text.style) {
+    case quick_ftxui_ast::sep_style::Normal:
+      data->components.push_back(
+          ftxui::Renderer([&] {   return ftxui::separator(); }));
+      break;
+
+    case quick_ftxui_ast::sep_style::Light:
+      data->components.push_back(
+          ftxui::Renderer([&] {   return ftxui::separatorLight(); }));
+      break;
+    case quick_ftxui_ast::sep_style::Dashed:
+      data->components.push_back(
+          ftxui::Renderer([&] {   return ftxui::separatorDashed(); }));
+      break;
+    case quick_ftxui_ast::sep_style::Double:
+      data->components.push_back(
+          ftxui::Renderer([&] {   return ftxui::separatorDouble(); }));
+      break;
+    case quick_ftxui_ast::sep_style::Heavy: {
+      data->components.push_back(
+          ftxui::Renderer([&] {   return ftxui::separatorHeavy(); }));
+      break;
+    }
+    default:
+      throw std::runtime_error("Should not reach here");
+    }
+    // clang-format on
+  }
+
   void operator()(quick_ftxui_ast::int_variable_decl const &text) const {
     // tab(indent + tabsize);
 
@@ -683,6 +747,14 @@ struct parser
           ("Yellow", quick_ftxui_ast::colours::Yellow)
           ("YellowLight", quick_ftxui_ast::colours::YellowLight)
           ;
+        sep_kw
+          .add
+          ("Normal", quick_ftxui_ast::sep_style::Normal)
+          ("Light", quick_ftxui_ast::sep_style::Light)
+          ("Heavy", quick_ftxui_ast::sep_style::Heavy)
+          ("Double", quick_ftxui_ast::sep_style::Double)
+          ("Dashed", quick_ftxui_ast::sep_style::Dashed)
+          ;
     // clang-format on
 
     quoted_string %= qi::lexeme['"' >> +(char_ - '"') >> '"'];
@@ -718,8 +790,13 @@ struct parser
 
     str_var_decl %= qi::lit("str") >> identifier >> -('=' > quoted_string);
 
+    text_comp %= -(color_kw) >> qi::lit("text") >> '(' >> quoted_string >> ')';
+
+    sep_comp %= -(sep_kw) >> qi::lit("separator");
+
     node = button_comp | input_comp | slider_comp | menu_comp | toggle_comp |
-           drpdwn_comp | int_var_decl | str_var_decl | expression;
+           drpdwn_comp | int_var_decl | str_var_decl | text_comp | sep_comp |
+           expression;
 
     expression = alignment_kw >> '{' >> *node >> '}';
 
@@ -746,11 +823,14 @@ struct parser
       int_var_decl;
   qi::rule<Iterator, quick_ftxui_ast::str_variable_decl(), ascii::space_type>
       str_var_decl;
+  qi::rule<Iterator, quick_ftxui_ast::dom_text(), ascii::space_type> text_comp;
+  qi::rule<Iterator, quick_ftxui_ast::separator(), ascii::space_type> sep_comp;
   qi::symbols<char, quick_ftxui_ast::block_alignment> alignment_kw;
   qi::symbols<char, quick_ftxui_ast::button_option> buttonopt_kw;
   qi::symbols<char, quick_ftxui_ast::input_option> inputopt_kw;
   qi::symbols<char, quick_ftxui_ast::menu_option> menuopt_kw;
   qi::symbols<char, quick_ftxui_ast::colours> color_kw;
+  qi::symbols<char, quick_ftxui_ast::sep_style> sep_kw;
 };
 
 void parse_qf(std::string source_code) {

@@ -1,0 +1,15 @@
+Vertical {
+    Blue text("The given button opens chrome in Linux")
+    str a
+    Red Button {
+        "chrome",
+        System("/usr/bin/google-chrome-stable"),
+        Animated,
+        a
+    }
+    Green text("This text is Green")
+    Button {
+        "Exit",
+        "Exit"
+    }
+}

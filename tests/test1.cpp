@@ -21,9 +21,11 @@ TEST_CASE("Parse Simple") {
   // expect pass
   REQUIRE(parse_helper("Vertical{Red Button{\"amool\",\"bmpp\",Ascii}}"));
   REQUIRE(parse_helper("Vertical{Button{\"amool\",\"bmpp\",Simple}}"));
-  REQUIRE(parse_helper("Vertical{YellowLight Button{\"amool\",\"bmpp\",Animated}}"));
+  REQUIRE(parse_helper(
+      "Vertical{YellowLight Button{\"amool\",\"bmpp\",Animated}}"));
   REQUIRE(parse_helper("Vertical{Button{\"amool\",\"bmpp\"}}"));
-  REQUIRE(parse_helper("Vertical{str x Blue Button{\"amool\",System(\"ls\"), x}}"));
+  REQUIRE(
+      parse_helper("Vertical{str x Blue Button{\"amool\",System(\"ls\"), x}}"));
   REQUIRE(parse_helper("Horizontal{Button{\"amool\",\"bmpp\",Ascii}}"));
   REQUIRE(parse_helper("Horizontal{Cyan Button{\"amool\",\"bmpp\",Simple}}"));
   REQUIRE(parse_helper("Horizontal{Button{\"amool\",\"bmpp\",Animated}}"));
@@ -31,7 +33,8 @@ TEST_CASE("Parse Simple") {
   REQUIRE(parse_helper(
       "Horizontal{str y Button{\"amool\",System(\"mkdir dir1\"), y}}"));
 
-  REQUIRE(parse_helper("Vertical{int x Black Slider{\"amool\", x, 5, 100, 1}}"));
+  REQUIRE(
+      parse_helper("Vertical{int x Black Slider{\"amool\", x, 5, 100, 1}}"));
   REQUIRE(parse_helper("Horizontal{int y Slider{\"amool\", y, 5, 100, 1}}"));
 
   REQUIRE(parse_helper(
@@ -41,15 +44,18 @@ TEST_CASE("Parse Simple") {
       parse_helper("Vertical{           Button{          \"amool\"    ,       "
                    "\"bmpp\"    ,       Simple }           }"));
 
-  REQUIRE(parse_helper(
-      "Vertical{int y Magenta Dropdown{[\"Physics\",  \"Maths\",  \"Chemistry\", "
-      " \"Biology\",], y}}"));
-  REQUIRE(parse_helper("Horizontal{int z Default Menu{[\"Physics\",  \"Maths\",  "
-                       "\"Chemistry\",  \"Biology\",], z}}"));
+  REQUIRE(parse_helper("Vertical{int y Magenta Dropdown{[\"Physics\",  "
+                       "\"Maths\",  \"Chemistry\", "
+                       " \"Biology\",], y}}"));
+  REQUIRE(
+      parse_helper("Horizontal{int z Default Menu{[\"Physics\",  \"Maths\",  "
+                   "\"Chemistry\",  \"Biology\",], z}}"));
   REQUIRE(parse_helper("Vertical{int opt Toggle{[\"Opt1\", \"Opt2\",], opt}}"));
-  REQUIRE(parse_helper("Horizontal{int a MagentaLight Toggle{[\"Opt1\", \"Opt2\",], a}}"));
+  REQUIRE(parse_helper(
+      "Horizontal{int a MagentaLight Toggle{[\"Opt1\", \"Opt2\",], a}}"));
   REQUIRE(parse_helper("Vertical{int b Toggle{[\"Opt1\", \"Opt2\",], b}}"));
-  REQUIRE(parse_helper("Horizontal{int x_ GrayDark Toggle{[\"Opt1\", \"Opt2\",], x_}}"));
+  REQUIRE(parse_helper(
+      "Horizontal{int x_ GrayDark Toggle{[\"Opt1\", \"Opt2\",], x_}}"));
 
   // expect fail
   REQUIRE(!parse_helper("\"amool\"{Button{\"amool\",\"bmpp\",\"cmqq\"}}"));

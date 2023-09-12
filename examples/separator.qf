@@ -1,0 +1,21 @@
+Vertical{
+    text("Normal")
+    Normal separator
+    text("Light")
+    Light separator
+    text("Heavy")
+    Heavy separator
+    Horizontal {
+        text("Double")
+        Double separator
+        text("lorem ipsum")    
+    }
+    separator
+    text("Dashed")
+    Dashed separator
+    Button {
+        "Exit",
+        "Exit",
+        Animated
+    }
+}
