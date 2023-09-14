@@ -36,6 +36,7 @@ std::map<std::string, std::string> strings;
 struct nil {};
 struct dom_text;
 struct separator;
+struct paragraph;
 struct button;
 struct expression;
 struct input;
@@ -110,7 +111,7 @@ typedef boost::variant<
     boost::recursive_wrapper<slider>, boost::recursive_wrapper<menu>,
     boost::recursive_wrapper<toggle>, boost::recursive_wrapper<dropdown>,
     boost::recursive_wrapper<expression>, boost::recursive_wrapper<dom_text>,
-    boost::recursive_wrapper<separator>,
+    boost::recursive_wrapper<separator>, boost::recursive_wrapper<paragraph>,
     boost::recursive_wrapper<int_variable_decl>,
     boost::recursive_wrapper<str_variable_decl>>
     node;
@@ -165,6 +166,11 @@ struct dom_text {
 
 struct separator {
   sep_style style = sep_style::Normal;
+};
+
+struct paragraph {
+  colours color = colours::Default;
+  std::string content = "";
 };
 
 struct int_variable_decl {
@@ -272,6 +278,11 @@ BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::dom_text,
 
 BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::separator,
                           (quick_ftxui_ast::sep_style, style)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::paragraph,
+                          (quick_ftxui_ast::colours, color)
+                          (std::string, content)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::int_variable_decl,
@@ -615,15 +626,21 @@ struct node_printer : boost::static_visitor<> {
       data->components.push_back(
           ftxui::Renderer([&] {   return ftxui::separatorDouble(); }));
       break;
-    case quick_ftxui_ast::sep_style::Heavy: {
+    case quick_ftxui_ast::sep_style::Heavy:
       data->components.push_back(
           ftxui::Renderer([&] {   return ftxui::separatorHeavy(); }));
       break;
-    }
     default:
       throw std::runtime_error("Should not reach here");
     }
     // clang-format on
+  }
+
+  void operator()(quick_ftxui_ast::paragraph const &text) const {
+    data->components.push_back(ftxui::Renderer([&] {
+      return (ftxui::paragraph(text.content) |
+              ftxui::color(quick_ftxui_ast::resolveColour(text.color)));
+    }));
   }
 
   void operator()(quick_ftxui_ast::int_variable_decl const &text) const {
@@ -790,13 +807,16 @@ struct parser
 
     str_var_decl %= qi::lit("str") >> identifier >> -('=' > quoted_string);
 
-    text_comp %= -(color_kw) >> qi::lit("text") >> '(' >> quoted_string >> ')';
+    text_comp %= -(color_kw) >> qi::lit("Text") >> '(' >> quoted_string >> ')';
 
     sep_comp %= -(sep_kw) >> qi::lit("separator");
 
+    para_comp %=
+        -(color_kw) >> qi::lit("Paragraph") >> '(' >> quoted_string >> ')';
+
     node = button_comp | input_comp | slider_comp | menu_comp | toggle_comp |
            drpdwn_comp | int_var_decl | str_var_decl | text_comp | sep_comp |
-           expression;
+           para_comp | expression;
 
     expression = alignment_kw >> '{' >> *node >> '}';
 
@@ -825,6 +845,7 @@ struct parser
       str_var_decl;
   qi::rule<Iterator, quick_ftxui_ast::dom_text(), ascii::space_type> text_comp;
   qi::rule<Iterator, quick_ftxui_ast::separator(), ascii::space_type> sep_comp;
+  qi::rule<Iterator, quick_ftxui_ast::paragraph(), ascii::space_type> para_comp;
   qi::symbols<char, quick_ftxui_ast::block_alignment> alignment_kw;
   qi::symbols<char, quick_ftxui_ast::button_option> buttonopt_kw;
   qi::symbols<char, quick_ftxui_ast::input_option> inputopt_kw;

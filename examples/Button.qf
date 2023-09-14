@@ -19,7 +19,7 @@ Vertical{
         }
     }
     Heavy separator
-    text("This button exits the TUI")
+    Text("This button exits the TUI")
     Button {
         "Exit",
         "Exit"

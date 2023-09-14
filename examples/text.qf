@@ -1,5 +1,5 @@
 Vertical {
-    Blue text("The given button opens chrome in Linux")
+    Blue Text("The given button opens chrome in Linux")
     str a
     Red Button {
         "chrome",
@@ -7,7 +7,7 @@ Vertical {
         Animated,
         a
     }
-    Green text("This text is Green")
+    Green Text("This text is Green")
     Button {
         "Exit",
         "Exit"

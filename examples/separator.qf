@@ -1,17 +1,17 @@
 Vertical{
-    text("Normal")
+    Text("Normal")
     Normal separator
-    text("Light")
+    Text("Light")
     Light separator
-    text("Heavy")
+    Text("Heavy")
     Heavy separator
     Horizontal {
-        text("Double")
+        Text("Double")
         Double separator
-        text("lorem ipsum")    
+        Text("lorem ipsum")    
     }
     separator
-    text("Dashed")
+    Text("Dashed")
     Dashed separator
     Button {
         "Exit",
