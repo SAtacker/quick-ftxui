@@ -58,6 +58,16 @@ enum menu_option {
   HorizontalAnimated,
   VerticalAnimated
 };
+enum text_style {
+  none,
+  bold,
+  dim,
+  inverted,
+  underlined,
+  underlinedDouble,
+  blink,
+  strikethrough
+};
 
 enum colours {
   Default,
@@ -160,6 +170,7 @@ struct dropdown {
 };
 
 struct dom_text {
+  text_style style = text_style::none;
   colours color = colours::Default;
   std::string content = "";
 };
@@ -272,6 +283,7 @@ BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::dropdown,
 )
 
 BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::dom_text,
+                          (quick_ftxui_ast::text_style, style)
                           (quick_ftxui_ast::colours, color)
                           (std::string, content)
 )
@@ -598,10 +610,67 @@ struct node_printer : boost::static_visitor<> {
   void operator()(quick_ftxui_ast::dom_text const &text) const {
     // tab(indent + tabsize);
     // std::cout << "nil: \"" << text << '"' << std::endl;
-    data->components.push_back(ftxui::Renderer([&] {
-      return (ftxui::text(text.content) |
-              ftxui::color(quick_ftxui_ast::resolveColour(text.color)));
-    }));
+    switch (text.style) {
+    case quick_ftxui_ast::text_style::none:
+      data->components.push_back(ftxui::Renderer([&] {
+        return (ftxui::text(text.content) |
+                ftxui::color(quick_ftxui_ast::resolveColour(text.color)));
+      }));
+      break;
+
+    case quick_ftxui_ast::text_style::bold:
+      data->components.push_back(ftxui::Renderer([&] {
+        return (ftxui::text(text.content) | ftxui::bold |
+                ftxui::color(quick_ftxui_ast::resolveColour(text.color)));
+      }));
+      break;
+
+    case quick_ftxui_ast::text_style::blink:
+      data->components.push_back(ftxui::Renderer([&] {
+        return (ftxui::text(text.content) | ftxui::blink |
+                ftxui::color(quick_ftxui_ast::resolveColour(text.color)));
+      }));
+      break;
+
+    case quick_ftxui_ast::text_style::underlined:
+      data->components.push_back(ftxui::Renderer([&] {
+        return (ftxui::text(text.content) | ftxui::underlined |
+                ftxui::color(quick_ftxui_ast::resolveColour(text.color)));
+      }));
+      break;
+
+    case quick_ftxui_ast::text_style::underlinedDouble:
+      data->components.push_back(ftxui::Renderer([&] {
+        return (ftxui::text(text.content) | ftxui::underlinedDouble |
+                ftxui::color(quick_ftxui_ast::resolveColour(text.color)));
+      }));
+      break;
+
+    case quick_ftxui_ast::text_style::dim:
+      data->components.push_back(ftxui::Renderer([&] {
+        return (ftxui::text(text.content) | ftxui::dim |
+                ftxui::color(quick_ftxui_ast::resolveColour(text.color)));
+      }));
+      break;
+
+    case quick_ftxui_ast::text_style::inverted:
+      data->components.push_back(ftxui::Renderer([&] {
+        return (ftxui::text(text.content) | ftxui::inverted |
+                ftxui::color(quick_ftxui_ast::resolveColour(text.color)));
+      }));
+      break;
+
+    case quick_ftxui_ast::text_style::strikethrough:
+      data->components.push_back(ftxui::Renderer([&] {
+        return (ftxui::text(text.content) | ftxui::strikethrough |
+                ftxui::color(quick_ftxui_ast::resolveColour(text.color)));
+      }));
+      break;
+
+    default:
+      throw std::runtime_error("Should not reach here");
+      break;
+    }
   }
 
   void operator()(quick_ftxui_ast::separator const &text) const {
@@ -637,6 +706,7 @@ struct node_printer : boost::static_visitor<> {
   }
 
   void operator()(quick_ftxui_ast::paragraph const &text) const {
+
     data->components.push_back(ftxui::Renderer([&] {
       return (ftxui::paragraph(text.content) |
               ftxui::color(quick_ftxui_ast::resolveColour(text.color)));
@@ -772,6 +842,17 @@ struct parser
           ("Double", quick_ftxui_ast::sep_style::Double)
           ("Dashed", quick_ftxui_ast::sep_style::Dashed)
           ;
+        text_style_kw
+          .add
+          ("bold", quick_ftxui_ast::text_style::bold)
+          ("underlined", quick_ftxui_ast::text_style::underlined)
+          ("underlinedDouble", quick_ftxui_ast::text_style::underlinedDouble)
+          ("dim", quick_ftxui_ast::text_style::dim)
+          ("inverted", quick_ftxui_ast::text_style::inverted)
+          ("blink", quick_ftxui_ast::text_style::blink)
+          ("strikethrough", quick_ftxui_ast::text_style::strikethrough)
+          ;
+
     // clang-format on
 
     quoted_string %= qi::lexeme['"' >> +(char_ - '"') >> '"'];
@@ -807,7 +888,8 @@ struct parser
 
     str_var_decl %= qi::lit("str") >> identifier >> -('=' > quoted_string);
 
-    text_comp %= -(color_kw) >> qi::lit("Text") >> '(' >> quoted_string >> ')';
+    text_comp %= -(text_style_kw) >> -(color_kw) >> qi::lit("Text") >> '(' >>
+                 quoted_string >> ')';
 
     sep_comp %= -(sep_kw) >> qi::lit("separator");
 
@@ -815,7 +897,7 @@ struct parser
         -(color_kw) >> qi::lit("Paragraph") >> '(' >> quoted_string >> ')';
 
     node = button_comp | input_comp | slider_comp | menu_comp | toggle_comp |
-           drpdwn_comp | int_var_decl | str_var_decl | text_comp | sep_comp |
+           drpdwn_comp | text_comp | int_var_decl | str_var_decl | sep_comp |
            para_comp | expression;
 
     expression = alignment_kw >> '{' >> *node >> '}';
@@ -852,6 +934,7 @@ struct parser
   qi::symbols<char, quick_ftxui_ast::menu_option> menuopt_kw;
   qi::symbols<char, quick_ftxui_ast::colours> color_kw;
   qi::symbols<char, quick_ftxui_ast::sep_style> sep_kw;
+  qi::symbols<char, quick_ftxui_ast::text_style> text_style_kw;
 };
 
 void parse_qf(std::string source_code) {

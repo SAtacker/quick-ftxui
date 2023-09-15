@@ -1,0 +1,14 @@
+Vertical {
+    Text("This is normal")
+    bold Yellow Text("This is bold, yellow text")
+    dim Text("This is dim")
+    underlined Text("Underlined text")
+    underlinedDouble Magenta Text("Double underlines!!")
+    blink Text("This is blinking")
+    inverted Red Text("This has an inverted look")
+    strikethrough Text("This is strikethrough")
+    Red Button {
+        "X",
+        "Exit"
+    }
+}
