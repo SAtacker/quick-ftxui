@@ -113,7 +113,7 @@ https://github.com/vrnimje/quick-ftxui/assets/103848930/c0d92edb-79fe-434d-9d72-
 
 * #### Embedded scripting supported in C++
 
-    Supports basic scripting functionality, with functions to add & access the quick-ftxui variables. Just add the `quick-ftxui.hpp` file in your projects include directory.
+    Supports basic scripting functionality, with functions to add & access the quick-ftxui variables.
     
     [Full Example](./cpp_examples/example.cpp)
 
@@ -199,7 +199,7 @@ ninja
 
 ## Acknowledgements
 
-* Special Thanks to [Shreyas Atre](https://github.com/SAtacker) and [Krishna Narayanan](https://github.com/Krishna-13-cyber) for their very crucial [foundational work](https://github.com/SAtacker/quick-ftxui) and mentoring.
+* Special Thanks to [Shreyas Atre](https://github.com/SAtacker) and [Krishna Narayanan](https://github.com/Krishna-13-cyber) for their very crucial [foundational work](https://github.com/SAtacker/quick-ftxui) and guidance.
 * Thanks to [Prit Kanadiya](https://github.com/PritK99) and [Khushi Balia](https://github.com/Khushi-Balia) for their contributions to the rest of the codebase
 * Thanks to [Arthur Sonzogni](https://github.com/ArthurSonzogni) for his [FTXUI starter repository template](https://github.com/ArthurSonzogni/ftxui-starter), and his amazing FTXUI library 
 
