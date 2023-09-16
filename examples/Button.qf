@@ -1,9 +1,9 @@
-Vertical{
+LightBorder Vertical{
     int x = 5
     str y = "Test"
     str z = "init"
     str a
-    Horizontal {
+    DashedBorder Horizontal {
         Red Button {
             "ls -l",
             System("ls -l"),

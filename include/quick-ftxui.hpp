@@ -51,6 +51,15 @@ enum block_alignment { VERTICAL, HORIZONTAL };
 enum button_option { Ascii, Animated, Simple, NoOpt };
 enum input_option { None, Password };
 enum sep_style { Normal, Light, Dashed, Double, Heavy };
+enum borders {
+  NoBorder,
+  NormalBorder,
+  LightBorder,
+  DashedBorder,
+  DoubleBorder,
+  HeavyBorder,
+  RoundedBorder
+};
 enum menu_option {
   NoMenuOption,
   Horizontal,
@@ -195,6 +204,7 @@ struct str_variable_decl {
 };
 
 struct expression {
+  borders border_opt = borders::NoBorder;
   block_alignment align;
   std::list<node> expr;
 };
@@ -308,6 +318,7 @@ BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::str_variable_decl,
 )
 
 BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::expression,
+                          (quick_ftxui_ast::borders, border_opt)
                           (quick_ftxui_ast::block_alignment, align)
                           (std::list<quick_ftxui_ast::node>, expr)
 )
@@ -355,20 +366,51 @@ struct node_printer : boost::static_visitor<> {
   void operator()(quick_ftxui_ast::expression const &expr) const {
     component_meta_data data_nest{data->screen};
     ast_printer(&data_nest, indent + tabsize)(expr);
-
+    ftxui::Component nest_comp;
     switch (expr.align) {
     case quick_ftxui_ast::block_alignment::VERTICAL: {
-      data->components.push_back(
-          ftxui::Container::Vertical({(data_nest).components}));
+      nest_comp = ftxui::Container::Vertical((data_nest).components);
       break;
     }
     case quick_ftxui_ast::block_alignment::HORIZONTAL: {
-      data->components.push_back(
-          ftxui::Container::Horizontal({(data_nest).components}));
+      nest_comp = ftxui::Container::Horizontal((data_nest).components);
       break;
     }
     default:
       throw std::runtime_error("Should never reach here");
+      break;
+    }
+
+    switch (expr.border_opt) {
+    case quick_ftxui_ast::borders::NoBorder:
+      data->components.push_back(nest_comp);
+      break;
+
+    case quick_ftxui_ast::borders::NormalBorder:
+      data->components.push_back(nest_comp | ftxui::border);
+      break;
+
+    case quick_ftxui_ast::borders::LightBorder:
+      data->components.push_back(nest_comp | ftxui::borderLight);
+      break;
+
+    case quick_ftxui_ast::borders::DashedBorder:
+      data->components.push_back(nest_comp | ftxui::borderDashed);
+      break;
+
+    case quick_ftxui_ast::borders::HeavyBorder:
+      data->components.push_back(nest_comp | ftxui::borderHeavy);
+      break;
+
+    case quick_ftxui_ast::borders::DoubleBorder:
+      data->components.push_back(nest_comp | ftxui::borderDouble);
+      break;
+
+    case quick_ftxui_ast::borders::RoundedBorder:
+      data->components.push_back(nest_comp | ftxui::borderRounded);
+      break;
+    default:
+      throw std::runtime_error("Border options should not reach here");
       break;
     }
   }
@@ -852,6 +894,15 @@ struct parser
           ("blink", quick_ftxui_ast::text_style::blink)
           ("strikethrough", quick_ftxui_ast::text_style::strikethrough)
           ;
+        border_kw
+          .add
+          ("Border", quick_ftxui_ast::borders::NormalBorder)
+          ("LightBorder", quick_ftxui_ast::borders::LightBorder)
+          ("HeavyBorder", quick_ftxui_ast::borders::HeavyBorder)
+          ("DashedBorder", quick_ftxui_ast::borders::DashedBorder)
+          ("DoubleBorder", quick_ftxui_ast::borders::DoubleBorder)
+          ("RoundedBorder", quick_ftxui_ast::borders::RoundedBorder)
+          ;
 
     // clang-format on
 
@@ -900,7 +951,7 @@ struct parser
            drpdwn_comp | text_comp | int_var_decl | str_var_decl | sep_comp |
            para_comp | expression;
 
-    expression = alignment_kw >> '{' >> *node >> '}';
+    expression = -(border_kw) >> alignment_kw >> '{' >> *node >> '}';
 
     // Debugging and error handling and reporting support.
     BOOST_SPIRIT_DEBUG_NODES((expression));
@@ -935,6 +986,7 @@ struct parser
   qi::symbols<char, quick_ftxui_ast::colours> color_kw;
   qi::symbols<char, quick_ftxui_ast::sep_style> sep_kw;
   qi::symbols<char, quick_ftxui_ast::text_style> text_style_kw;
+  qi::symbols<char, quick_ftxui_ast::borders> border_kw;
 };
 
 void parse_qf(std::string source_code) {
@@ -957,24 +1009,69 @@ void parse_qf(std::string source_code) {
     quick_ftxui::component_meta_data data{&screen, {}};
     quick_ftxui::ast_printer printer(&data, 0);
     printer(expression);
+
     if (data.components.size()) {
+      ftxui::Component component;
       switch (expression.align) {
       case quick_ftxui_ast::block_alignment::HORIZONTAL: {
-        auto component =
-            ftxui::Container::Horizontal(std::move(data.components));
-        auto main_renderer = ftxui::Renderer(
-            component, [&] { return ftxui::vbox({component->Render()}); });
-        screen.Loop(main_renderer);
+        component = ftxui::Container::Horizontal(std::move(data.components));
         break;
       }
       case quick_ftxui_ast::block_alignment::VERTICAL: {
-        auto component = ftxui::Container::Vertical(std::move(data.components));
-        auto main_renderer = ftxui::Renderer(
-            component, [&] { return ftxui::vbox({component->Render()}); });
-        screen.Loop(main_renderer);
+        component = ftxui::Container::Vertical(std::move(data.components));
         break;
       }
       }
+
+      ftxui::Component main_renderer;
+
+      switch (expression.border_opt) {
+      case quick_ftxui_ast::borders::NoBorder:
+        main_renderer = ftxui::Renderer(
+            component, [&] { return ftxui::vbox({component->Render()}); });
+        break;
+
+      case quick_ftxui_ast::borders::NormalBorder:
+        main_renderer = ftxui::Renderer(component, [&] {
+          return ftxui::vbox({component->Render()}) | ftxui::border;
+        });
+        break;
+
+      case quick_ftxui_ast::borders::LightBorder:
+        main_renderer = ftxui::Renderer(component, [&] {
+          return ftxui::vbox({component->Render()}) | ftxui::borderLight;
+        });
+        break;
+
+      case quick_ftxui_ast::borders::DashedBorder:
+        main_renderer = ftxui::Renderer(component, [&] {
+          return ftxui::vbox({component->Render()}) | ftxui::borderDashed;
+        });
+        break;
+
+      case quick_ftxui_ast::borders::HeavyBorder:
+        main_renderer = ftxui::Renderer(component, [&] {
+          return ftxui::vbox({component->Render()}) | ftxui::borderHeavy;
+        });
+        break;
+
+      case quick_ftxui_ast::borders::DoubleBorder:
+        main_renderer = ftxui::Renderer(component, [&] {
+          return ftxui::vbox({component->Render()}) | ftxui::borderDouble;
+        });
+        break;
+
+      case quick_ftxui_ast::borders::RoundedBorder:
+        main_renderer = ftxui::Renderer(component, [&] {
+          return ftxui::vbox({component->Render()}) | ftxui::borderRounded;
+        });
+        break;
+      default:
+        throw std::runtime_error("Border options should not reach here");
+        break;
+      }
+
+      screen.Loop(main_renderer);
     }
   } else {
     throw std::runtime_error("Parsing failed\n");

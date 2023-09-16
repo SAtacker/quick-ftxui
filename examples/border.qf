@@ -1,0 +1,25 @@
+Vertical {
+    Border Vertical {
+        Text("This is normal border")
+    }
+
+    LightBorder Vertical {
+        Text("This is light border")
+    }
+
+    HeavyBorder Vertical {
+        Text("This is heavy border")
+    }
+
+    DashedBorder Horizontal {
+        Text("This is dashed border")
+    }
+
+    RoundedBorder Vertical {
+        Text("This is rounded border")
+    }
+
+    DoubleBorder Vertical {
+        Text("This is double border")
+    }
+}
