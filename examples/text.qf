@@ -8,6 +8,9 @@ Vertical {
         a
     }
     strikethrough Green Text("This text is Green")
+    Horizontal {
+        hyperlink Blue Text("Google", "https://www.google.com/")
+    }
     Button {
         "Exit",
         "Exit"

@@ -75,7 +75,8 @@ enum text_style {
   underlined,
   underlinedDouble,
   blink,
-  strikethrough
+  strikethrough,
+  hyperlink
 };
 
 enum colours {
@@ -182,6 +183,7 @@ struct dom_text {
   text_style style = text_style::none;
   colours color = colours::Default;
   std::string content = "";
+  std::string link = "";
 };
 
 struct separator {
@@ -296,6 +298,7 @@ BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::dom_text,
                           (quick_ftxui_ast::text_style, style)
                           (quick_ftxui_ast::colours, color)
                           (std::string, content)
+                          (std::string, link)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::separator,
@@ -652,6 +655,7 @@ struct node_printer : boost::static_visitor<> {
   void operator()(quick_ftxui_ast::dom_text const &text) const {
     // tab(indent + tabsize);
     // std::cout << "nil: \"" << text << '"' << std::endl;
+
     switch (text.style) {
     case quick_ftxui_ast::text_style::none:
       data->components.push_back(ftxui::Renderer([&] {
@@ -705,6 +709,16 @@ struct node_printer : boost::static_visitor<> {
     case quick_ftxui_ast::text_style::strikethrough:
       data->components.push_back(ftxui::Renderer([&] {
         return (ftxui::text(text.content) | ftxui::strikethrough |
+                ftxui::color(quick_ftxui_ast::resolveColour(text.color)));
+      }));
+      break;
+
+    case quick_ftxui_ast::text_style::hyperlink:
+      if (text.link.empty()) {
+        throw std::runtime_error("Hyperlink style used, but link not provided");
+      }
+      data->components.push_back(ftxui::Renderer([&] {
+        return (ftxui::text(text.content) | ftxui::hyperlink(text.link) |
                 ftxui::color(quick_ftxui_ast::resolveColour(text.color)));
       }));
       break;
@@ -893,6 +907,7 @@ struct parser
           ("inverted", quick_ftxui_ast::text_style::inverted)
           ("blink", quick_ftxui_ast::text_style::blink)
           ("strikethrough", quick_ftxui_ast::text_style::strikethrough)
+          ("hyperlink", quick_ftxui_ast::text_style::hyperlink)
           ;
         border_kw
           .add
@@ -940,7 +955,7 @@ struct parser
     str_var_decl %= qi::lit("str") >> identifier >> -('=' > quoted_string);
 
     text_comp %= -(text_style_kw) >> -(color_kw) >> qi::lit("Text") >> '(' >>
-                 quoted_string >> ')';
+                 quoted_string >> -(',' >> quoted_string) >> ')';
 
     sep_comp %= -(sep_kw) >> qi::lit("separator");
 
