@@ -180,8 +180,8 @@ struct dropdown {
 };
 
 struct dom_text {
-  text_style style = text_style::none;
   colours color = colours::Default;
+  text_style style = text_style::none;
   std::string content = "";
   std::string link = "";
 };
@@ -295,8 +295,8 @@ BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::dropdown,
 )
 
 BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::dom_text,
-                          (quick_ftxui_ast::text_style, style)
                           (quick_ftxui_ast::colours, color)
+                          (quick_ftxui_ast::text_style, style)
                           (std::string, content)
                           (std::string, link)
 )
@@ -954,7 +954,7 @@ struct parser
 
     str_var_decl %= qi::lit("str") >> identifier >> -('=' > quoted_string);
 
-    text_comp %= -(text_style_kw) >> -(color_kw) >> qi::lit("Text") >> '(' >>
+    text_comp %= -(color_kw) >> -(text_style_kw) >> qi::lit("Text") >> '(' >>
                  quoted_string >> -(',' >> quoted_string) >> ')';
 
     sep_comp %= -(sep_kw) >> qi::lit("separator");

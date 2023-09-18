@@ -1,5 +1,5 @@
 Vertical {
-    bold BlueLight Text("The given button opens chrome in Linux")
+    BlueLight bold Text("The given button opens chrome in Linux")
     str a
     Red Button {
         "chrome",
@@ -7,9 +7,9 @@ Vertical {
         Animated,
         a
     }
-    strikethrough Green Text("This text is Green")
+    Green strikethrough Text("This text is Green")
     Horizontal {
-        hyperlink Blue Text("Google", "https://www.google.com/")
+        Blue hyperlink Text("Google", "https://www.google.com/")
     }
     Button {
         "Exit",

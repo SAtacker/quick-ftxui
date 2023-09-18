@@ -173,3 +173,133 @@ TEST_CASE("Parse Recursive") {
         }\
         }"));
 }
+
+TEST_CASE("Parse DOM elements") {
+  REQUIRE(parse_helper("Vertical {\
+        Text(\"Hello World\")       \
+        separator                   \
+        Paragraph(\"Hello to his paragraph\")\
+        HeavyBorder Horizontal {    \
+            RedLight dim Text(\"amool\") \
+        }\
+    }"));
+
+  // Parse text and its styles
+  REQUIRE(parse_helper("Vertical {\
+        Blue Text(\"Hello World\")  \
+        Red bold Text(\"amool\")    \
+        dim Text(\"bmpp\")          \
+        underlined Text(\"cmqq\")   \
+        Magenta underlinedDouble Text(\"dmrr\") \
+        blink Text(\"emss\")        \
+        Red inverted Text(\"This has an inverted look\")    \
+        strikethrough Text(\"This is strikethrough\")   \
+    }"));
+
+  REQUIRE(!parse_helper("Vertical {\
+        blue Text(\"Hello World\")  \
+        Bold Red Text(\"amool\")    \
+        DIM Text(\"bmpp\")          \
+        underlined Text(cmqq)   \
+        underlinedDouble Magenta Text(\"dmrr\") \
+        blink Text(123)        \
+        inverted Red Text(\"This has an inverted look\")    \
+        strikethrough Text(\"This is strikethrough\")   \
+    }"));
+
+  // Paragraphs, separators and borders
+  REQUIRE(parse_helper("HeavyBorder Vertical {\
+        Paragraph(\"I guess I should have talked before going into the unknown\")\
+        separator   \
+        Paragraph(\"Lorem ipsum dolor sit amet, consectetur adipiscing elit,    \
+            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.      \
+            Ut enim ad minim veniam, quis nostrud exercitation ullamco          \
+            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure    \
+            dolor in reprehenderit in voluptate velit esse cillum dolore    \
+            eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat     \
+            non proident, sunt in culpa qui officia deserunt mollit anim    \
+            id est laborum.\")  \
+        Dashed separator        \
+        Border Horizontal {     \
+            Paragraph(\"This is my peace offering.\")     \
+        }\
+    }"));
+
+  REQUIRE(!parse_helper("Heavy Border Vertical {\
+        Paragraph(\"I guess I should have talked before going into the unknown\")\
+        separator   \
+        Paragraph(\"Lorem ipsum dolor sit amet, consectetur adipiscing elit,    \
+            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.      \
+            Ut enim ad minim veniam, quis nostrud exercitation ullamco          \
+            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure    \
+            dolor in reprehenderit in voluptate velit esse cillum dolore    \
+            eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat     \
+            non proident, sunt in culpa qui officia deserunt mollit anim    \
+            id est laborum.\")  \
+        dashed separator        \
+        Paragraph(This is my peace offering)     \
+    }"));
+}
+
+TEST_CASE("Parse Components and DOM together") {
+  REQUIRE(parse_helper("HeavyBorder Vertical {\
+        int x                                   \
+        Blue Slider{                            \
+            \"amool\",                          \
+            x,                                  \
+            0,                                  \
+            30,                                 \
+            2                                   \
+        }                                       \
+        Double separator                        \
+        LightBorder Horizontal {                \
+            Yellow dim Text(\"bmpp\")           \
+        }                                       \
+        str y                                   \
+        Button {                                \
+            \"amool\",                          \
+            System(\"ls -l\"),                  \
+            y                                   \
+        }                                       \
+    }"));
+
+  REQUIRE(parse_helper("DashedBorder Vertical{\
+        int x                                   \
+        Blue Dropdown{                          \
+            [\"amool\", \"bmpp\", \"cmqq\",],   \
+            x                                   \
+        }                                       \
+        Light separator                         \
+        RoundedBorder Horizontal {              \
+            Yellow strikethrough Text(\"dmrr\") \
+        }                                       \
+        str y                                   \
+        Button {                                \
+            \"amool\",                          \
+            System(\"ls -l\"),                  \
+            Animated,                            \
+            y                                   \
+        }                                       \
+    }"));
+
+  REQUIRE(!parse_helper("Heavy Border Vertical {\
+        int x                                   \
+        Blue Slider{                            \
+            \"amool\",                          \
+            x,                                  \
+            0,                                  \
+            30,                                 \
+            2                                   \
+        }                                       \
+        Double Separator                        \
+        Horizontal {                \
+            LightBorder Yellow dim Text(\"bmpp\")           \
+        }                                       \
+        str y                                   \
+        Button {                                \
+            \"amool\",                          \
+            System(\"ls -l\"),                  \
+            y                                   \
+        }                                       \
+    }"));
+}
