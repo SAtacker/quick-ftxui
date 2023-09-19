@@ -1,0 +1,18 @@
+RoundedBorder Vertical {
+    GrayDark Text("GrayDark")
+    Black Text("Black")
+    GrayLight Text("GrayLight")
+    White Text("White")
+    Blue Text("Blue")
+    BlueLight Text("BlueLight")
+    Cyan Text("Cyan")
+    CyanLight Text("CyanLight")
+    Green Text("Green")
+    GreenLight Text("GreenLight")
+    Magenta Text("Magenta")
+    MagentaLight Text("MagentaLight")
+    Red Text("Red")
+    RedLight Text("RedLight")
+    Yellow Text("Yellow")
+    YellowLight Text("YellowLight")
+}
