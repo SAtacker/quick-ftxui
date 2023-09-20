@@ -158,7 +158,7 @@ https://github.com/vrnimje/quick-ftxui/assets/103848930/715c821b-b259-4e2b-ab25-
 
 * #### Variables
 
-    Used as hooks, so that we can obtain the input given to the Terminal UI. Currenlty, supports `int` and `str` data types
+    Used as hooks, so that we can obtain the input given to the Terminal UI. Currently, supports `int` and `str` data types
 
     Check out the examples in [this directory](./examples/)
 
@@ -166,7 +166,7 @@ https://github.com/vrnimje/quick-ftxui/assets/103848930/715c821b-b259-4e2b-ab25-
 
 * #### Embedded scripting supported in C++
 
-    Supports basic scripting functionality, with functions to add & access the quick-ftxui variables.
+    Supports basic scripting functionality, with functions (or hooks) to add & access the quick-ftxui variables. We can also use C++ references to integers and string data types to access the values inside the QF script. See the example given below. 
     
     [Full Example](./cpp_examples/example.cpp)
 
@@ -179,46 +179,52 @@ https://github.com/vrnimje/quick-ftxui/assets/103848930/715c821b-b259-4e2b-ab25-
     using namespace quick_ftxui;
 
     int main() {
+        int x = 5;
+        string y = "Init value";
+        set_int_var("x", &x);
+        set_str_var("y", &y);
+        string source_code = R"(Border Vertical{
+                str z = "init"
+                str a
+                int o = 0
+                Input {
+                    "Type something...",
+                    y
+                }
+                RedLight Slider {
+                    "Test: ",
+                    x,
+                    0,
+                    100,
+                    2
+                }
+                Magenta Button{
+                    "Chrome",
+                    System("/usr/bin/google-chrome-stable"),
+                    Animated,
+                    z
+                }
+                Green Menu{
+                    [ "Physics",  "Maths",  "Chemistry",  "Biology",],
+                    VerticalAnimated,
+                    o
+                }
+                Button {
+                    "Exit",
+                    "Exit"
+                }
+            })";
 
-    set_int_var("x", 5);
-    set_str_var("y", "");
-    string source_code = R"(Vertical{
-            str z = "init"
-            str a
-            int o = 0
-            Input {
-                "Type something...",
-                Password,
-                y
-            }
-            Slider {
-                "Test: ",
-                x,
-                0,
-                100,
-                2
-            }
-            Button{
-                "ls",
-                System("/usr/bin/google-chrome-stable"),
-                Ascii,
-                z
-            }
-            Menu{
-                [ "Physics",  "Maths",  "Chemistry",  "Biology",],
-                VerticalAnimated,
-                o
-            }
-            Button {
-                "Exit",
-                "Exit"
-            }
-        })";
+        parse_qf(source_code);
 
-    parse_qf(source_code);
+        cout << "Slider value is: " << x << "\n";
+        cout << "User input is: " << y << "\n";
+        cout << "Option no. selected in Menu is: " << get_int("o") + 1 << "\n";
+        cout << "Chrome debug msgs are: " << get_str("z") << "\n";
+    }
     ```
 
-    **Note:** To run this above example, build this repository with examples, steps [given here](#build-with-examples)
+    **Note:** To run this example, build this repository with examples, steps [given here](#build-with-examples)
 
 ## Build instructions:
 ~~~bash
@@ -242,7 +248,7 @@ ninja
 
 - [x] Adding color (component wise)
 - [x] Adding FTXUI DOM elements (like seperator, border)
-- [ ] Adding a way to use C++ defined variables directly, instead of depending on script-variables 
+- [x] Adding a way to use C++ defined variables directly, instead of depending on script-variables 
 - [ ] Adding detailed user documentation
 
 ## Dependencies

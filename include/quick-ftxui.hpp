@@ -30,6 +30,9 @@ namespace quick_ftxui_ast {
 std::map<std::string, int> numbers;
 std::map<std::string, std::string> strings;
 
+std::map<int *, std::string> ref_nums;
+std::map<std::string *, std::string> ref_strs;
+
 ///////////////////////////////////////////////////////////////////////////
 //  The AST
 ///////////////////////////////////////////////////////////////////////////
@@ -1087,6 +1090,17 @@ void parse_qf(std::string source_code) {
       }
 
       screen.Loop(main_renderer);
+
+      for (auto It : quick_ftxui_ast::ref_nums) {
+        *(It.first) = quick_ftxui_ast::numbers[It.second];
+      }
+
+      for (auto It : quick_ftxui_ast::ref_nums) {
+        *(It.first) = quick_ftxui_ast::numbers[It.second];
+      }
+      for (auto It : quick_ftxui_ast::ref_strs) {
+        *(It.first) = quick_ftxui_ast::strings[It.second];
+      }
     }
   } else {
     throw std::runtime_error("Parsing failed\n");
@@ -1114,6 +1128,27 @@ void set_int_var(std::string var_name, int init_value) {
   }
 }
 
+void set_int_var(std::string var_name, int *init_value) {
+  if (auto It = quick_ftxui_ast::numbers.find(var_name);
+      It != quick_ftxui_ast::numbers.end()) {
+    throw std::runtime_error("Integer variable with name " + var_name +
+                             " already exists, please use another name");
+  } else {
+    quick_ftxui_ast::numbers.insert({var_name, (*init_value)});
+    quick_ftxui_ast::ref_nums.insert({init_value, var_name});
+  }
+}
+
+void set_int_var(std::string var_name) {
+  if (auto It = quick_ftxui_ast::numbers.find(var_name);
+      It != quick_ftxui_ast::numbers.end()) {
+    throw std::runtime_error("Integer variable with name " + var_name +
+                             " already exists, please use another name");
+  } else {
+    quick_ftxui_ast::numbers.insert({var_name, 0});
+  }
+}
+
 std::string get_str(std::string var_name) {
   if (auto It = quick_ftxui_ast::strings.find(std::string(var_name));
       It != quick_ftxui_ast::strings.end()) {
@@ -1132,6 +1167,27 @@ void set_str_var(std::string var_name, std::string init_value) {
                              " already exists, please use another name");
   } else {
     quick_ftxui_ast::strings.insert({var_name, init_value});
+  }
+}
+
+void set_str_var(std::string var_name) {
+  if (auto It = quick_ftxui_ast::strings.find(var_name);
+      It != quick_ftxui_ast::strings.end()) {
+    throw std::runtime_error("Integer variable with name " + var_name +
+                             " already exists, please use another name");
+  } else {
+    quick_ftxui_ast::strings.insert({var_name, ""});
+  }
+}
+
+void set_str_var(std::string var_name, std::string *init_value) {
+  if (auto It = quick_ftxui_ast::strings.find(var_name);
+      It != quick_ftxui_ast::strings.end()) {
+    throw std::runtime_error("Integer variable with name " + var_name +
+                             " already exists, please use another name");
+  } else {
+    quick_ftxui_ast::strings.insert({var_name, (*init_value)});
+    quick_ftxui_ast::ref_strs.insert({init_value, var_name});
   }
 }
 
