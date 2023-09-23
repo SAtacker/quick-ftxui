@@ -25,7 +25,8 @@ Vertical{
     Horizontal{
         Button{
             "Exit",
-            "Exit"
+            "Exit",
+            Animated
         }
     }
 }
