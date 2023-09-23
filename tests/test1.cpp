@@ -43,8 +43,28 @@ TEST_CASE("Parse Simple") {
 
     REQUIRE(parse_helper("Vertical{Menu{[\"Physics\"  \"Maths\"  \"Chemistry\" "
                          " \"Biology\"], 0}}"));
+    REQUIRE(parse_helper("Vertical{Menu{[\"Physics\"  \"Maths\"  \"Chemistry\" "
+                         " \"Biology\"], 0, Horizontal}}"));
+    REQUIRE(parse_helper("Vertical{Menu{[\"Physics\"  \"Maths\"  \"Chemistry\" "
+                         " \"Biology\"], 0, Vertical}}"));   
+    REQUIRE(parse_helper("Vertical{Menu{[\"Physics\"  \"Maths\"  \"Chemistry\" "
+                         " \"Biology\"], 0, Horizontal_Animated}}")); 
+    REQUIRE(parse_helper("Vertical{Menu{[\"Physics\"  \"Maths\"  \"Chemistry\" "
+                         " \"Biology\"], 0, Vertical_Animated}}"));
+    REQUIRE(parse_helper("Vertical{Menu{[\"Physics\"  \"Maths\"  \"Chemistry\" "
+                         " \"Biology\"], 0, Toggle}}"));                 
     REQUIRE(parse_helper("Horizontal{Menu{[\"Physics\"  \"Maths\"  "
                          "\"Chemistry\"  \"Biology\"], 0}}"));
+        REQUIRE(parse_helper("Horizontal{Menu{[\"Physics\"  \"Maths\"  \"Chemistry\" "
+                         " \"Biology\"], 0, Horizontal}}"));
+    REQUIRE(parse_helper("Horizontal{Menu{[\"Physics\"  \"Maths\"  \"Chemistry\" "
+                         " \"Biology\"], 0, Vertical}}"));   
+    REQUIRE(parse_helper("Horizontal{Menu{[\"Physics\"  \"Maths\"  \"Chemistry\" "
+                         " \"Biology\"], 0, Horizontal_Animated}}")); 
+    REQUIRE(parse_helper("Horizontal{Menu{[\"Physics\"  \"Maths\"  \"Chemistry\" "
+                         " \"Biology\"], 0, Vertical_Animated}}"));
+    REQUIRE(parse_helper("Horizontal{Menu{[\"Physics\"  \"Maths\"  \"Chemistry\" "
+                         " \"Biology\"], 0, Toggle}}"));   
     REQUIRE(parse_helper("Vertical{Toggle{[\"Opt1\" \"Opt2\"], 1}}"));
     REQUIRE(parse_helper("Horizontal{Toggle{[\"Opt1\" \"Opt2\"], 1}}"));
     REQUIRE(parse_helper("Vertical{Toggle{[\"Opt1\" \"Opt2\"], 0}}"));
