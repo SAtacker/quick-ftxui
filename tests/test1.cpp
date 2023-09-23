@@ -69,6 +69,11 @@ TEST_CASE("Parse Simple") {
     REQUIRE(parse_helper("Horizontal{Toggle{[\"Opt1\" \"Opt2\"], 1}}"));
     REQUIRE(parse_helper("Vertical{Toggle{[\"Opt1\" \"Opt2\"], 0}}"));
     REQUIRE(parse_helper("Horizontal{Toggle{[\"Opt1\" \"Opt2\"], 0}}"));
+    REQUIRE(parse_helper("Horizontal{Slider{\"amool\", 2, 5, 100, 1}}"));
+    REQUIRE(parse_helper(
+        "Horizontal{Radiobox{[\"amool\" \"amool\" \"hello\"], 0}}"));
+    REQUIRE(
+        parse_helper("Vertical{Radiobox{[ \"amol\" \"amool\" \"hello\"], 1}}"));
 
     //expect fail
     REQUIRE(!parse_helper("\"amool\"{Button{\"amool\",\"bmpp\",\"cmqq\"}}"));
@@ -80,6 +85,10 @@ TEST_CASE("Parse Simple") {
     REQUIRE(!parse_helper("Horizontal_{_Button{\"amool\",\"bmpp\",Simple}_}"));
     REQUIRE(!parse_helper("\"amool\"{Button{\"amool,\"bmpp\",Simple}}"));
     REQUIRE(!parse_helper("Vertical{Button{\"amool\" . \"bmpp\" . Ascii}}"));
+    REQUIRE(parse_helper("Vertical{Toggle{[\"Opt1\" \"Opt2\"], 3}}"));
+    REQUIRE(parse_helper("Vertical{Toggle{[\"Opt1\" \"Opt2\"], 8}}"));
+    REQUIRE(
+        parse_helper("Vertical{Radiobox{[ \"amol\" \"amool\" \"hello\"], 9}}"));
     REQUIRE(parse_helper("Vertical{Toggle{[\"Opt1\" \"Opt2\"], 3}}"));
     REQUIRE(parse_helper("Vertical{Toggle{[\"Opt1\" \"Opt2\"], 8}}"));
 }

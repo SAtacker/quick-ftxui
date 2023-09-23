@@ -35,6 +35,7 @@ struct input;
 struct slider;
 struct menu;
 struct toggle;
+struct radio;
 
 enum block_alignment { VERTICAL, HORIZONTAL };
 enum menu_option {
@@ -50,7 +51,8 @@ enum button_option { Ascii, Animated, Simple, NoOpt };
 typedef boost::variant<
     nil, boost::recursive_wrapper<button>, boost::recursive_wrapper<input>,
     boost::recursive_wrapper<slider>, boost::recursive_wrapper<menu>,
-    boost::recursive_wrapper<toggle>, boost::recursive_wrapper<expression>>
+    boost::recursive_wrapper<toggle>, boost::recursive_wrapper<radio>,
+    boost::recursive_wrapper<expression>>
     node;
 
 struct button {
@@ -82,6 +84,11 @@ struct menu {
 struct toggle {
     std::vector<std::string> entries;
     int selected;
+};
+
+struct radio {
+    std::vector<std::string> entries;
+    int selected = 0;
 };
 
 struct expression {
@@ -148,6 +155,11 @@ BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::menu,
 
 BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::toggle,
                           (std::vector <std::string> , entries)
+                          (int, selected)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(client::quick_ftxui_ast::radio,
+                          (std::vector<std::string>, entries)
                           (int, selected)
 )
 
@@ -344,6 +356,12 @@ struct node_printer : boost::static_visitor<> {
             ftxui::Toggle(&text.entries, (int *)&text.selected));
     }
 
+    void operator()(quick_ftxui_ast::radio const &text) const {
+        tab(indent + tabsize);
+        data->components.push_back(
+            ftxui::Radiobox(&text.entries, (int *)&text.selected));
+    }
+
     void operator()(quick_ftxui_ast::nil const &text) const {
         tab(indent + tabsize);
         std::cout << "nil: \"" << text << '"' << std::endl;
@@ -448,8 +466,11 @@ struct parser
         toggle_comp %= qi::lit("Toggle") >> '{' >> '[' >> *quoted_string >>
                        ']' >> ',' >> qi::int_ >> '}';
 
+        radio_comp %= qi::lit("Radiobox") >> '{' >> '[' >> *quoted_string >>
+                      ']' >> ',' >> qi::int_ >> '}';
+
         node = button_comp | input_comp | slider_comp | menu_comp |
-               toggle_comp | expression;
+               toggle_comp | radio_comp | expression;
 
         expression = alignment_kw >> '{' >> *node >> '}';
 
@@ -468,6 +489,7 @@ struct parser
     qi::rule<Iterator, quick_ftxui_ast::menu(), ascii::space_type> menu_comp;
     qi::rule<Iterator, quick_ftxui_ast::toggle(), ascii::space_type>
         toggle_comp;
+    qi::rule<Iterator, quick_ftxui_ast::radio(), ascii::space_type> radio_comp;
     qi::rule<Iterator, std::string(), ascii::space_type> quoted_string;
     qi::rule<Iterator, std::string(), ascii::space_type> button_function;
     qi::rule<Iterator, quick_ftxui_ast::slider(), ascii::space_type>
