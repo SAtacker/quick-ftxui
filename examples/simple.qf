@@ -1,0 +1,21 @@
+Border Vertical{
+  Text("Hello World")
+  int z
+  Dropdown {
+    [ "C", "C++", "Python", "Javascript", "Java", "Rust", "R", ],
+    z
+  }
+  separator
+  Horizontal {
+    str x
+    Button {
+      "List out files & directories in root/",
+      System("ls ~/"),
+      x
+    }
+    Button {
+      "Exit",
+      "Exit"
+    }
+  }
+}
