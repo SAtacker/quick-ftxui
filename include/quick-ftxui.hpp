@@ -561,10 +561,20 @@ struct node_printer : boost::static_visitor<> {
         It != quick_ftxui_ast::strings.end()) {
       ftxui::InputOption pass;
       ftxui::Color input_clr = quick_ftxui_ast::resolveColour(text.color);
+      pass.transform = [input_clr](ftxui::InputState state) {
+        state.element |= ftxui::color(input_clr);
+        if (state.is_placeholder) {
+          state.element |= ftxui::dim;
+        }
+        if (state.is_placeholder && state.focused) {
+          state.element |= bgcolor(input_clr);
+        }
+        return state.element;
+      };
       switch (text.opt) {
       case quick_ftxui_ast::input_option::None:
-        data->components.push_back(ftxui::Input(&It->second, text.placeholder) |
-                                   ftxui::color(input_clr));
+        data->components.push_back(
+            ftxui::Input(&It->second, text.placeholder, pass));
         break;
 
       case quick_ftxui_ast::input_option::Password:
