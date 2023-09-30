@@ -4,7 +4,6 @@ Vertical {
     str p
     GreenLight Input {
         "First Name....",
-        None,
         f
     }
     BlueLight Input {

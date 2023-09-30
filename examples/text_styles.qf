@@ -7,6 +7,7 @@ Vertical {
     blink Text("This is blinking")
     Red inverted Text("This has an inverted look")
     strikethrough Text("This is strikethrough")
+    Blue hyperlink Text("Google", "https://www.google.com/")
     Red Button {
         "X",
         "Exit"

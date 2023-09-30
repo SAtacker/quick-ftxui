@@ -580,8 +580,7 @@ struct node_printer : boost::static_visitor<> {
       case quick_ftxui_ast::input_option::Password:
         pass.password = true;
         data->components.push_back(
-            ftxui::Input(&It->second, text.placeholder, pass) |
-            ftxui::color(input_clr));
+            ftxui::Input(&It->second, text.placeholder, pass));
         break;
       default:
         throw std::runtime_error("Should never reach here");
