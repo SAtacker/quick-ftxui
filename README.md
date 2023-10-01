@@ -226,6 +226,8 @@ https://github.com/vrnimje/quick-ftxui/assets/103848930/715c821b-b259-4e2b-ab25-
 
     **Note:** To run this example, build this repository with examples, steps [given here](#build-with-examples)
 
+Check out the documentation for learning more about the language: [vrnimje.github.io/quick-ftxui/](https://vrnimje.github.io/quick-ftxui/)
+
 ## Build instructions:
 ~~~bash
 mkdir build
@@ -243,13 +245,6 @@ cmake .. -G "Ninja" -DQUICK_FTXUI_EXAMPLES=ON
 ninja
 ./cpp_examples/quick_ftxui_example
 ~~~
-
-## Roadmap for v0.2 release
-
-- [x] Adding color (component wise)
-- [x] Adding FTXUI DOM elements (like seperator, border)
-- [x] Adding a way to use C++ defined variables directly, instead of depending on script-variables 
-- [ ] Adding detailed user documentation
 
 ## Dependencies
 
