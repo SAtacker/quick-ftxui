@@ -38,6 +38,9 @@ jobs:
       CMAKE_PREFIX_PATH: ${{github.workspace}}/.local
     steps:
     - uses: actions/checkout@v2
+
+    - name: Install CXX compiler
+      run: sudo apt-get install -y ${{matrix.compiler}}
        
     - name: Configure CMake
       run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DQUICK_FTXUI_FETCH_BOOST=ON
