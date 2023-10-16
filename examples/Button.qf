@@ -3,6 +3,7 @@ LightBorder Vertical{
     str y = "Test"
     str z = "init"
     str a
+    // This is a nested block
     DashedBorder Horizontal {
         Red Button {
             "ls -l",
@@ -19,6 +20,9 @@ LightBorder Vertical{
         }
     }
     Heavy separator
+    /*
+    Exits the UI
+    */
     Text("This button exits the TUI")
     Button {
         "Exit",

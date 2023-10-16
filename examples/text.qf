@@ -1,4 +1,5 @@
 Vertical {
+    // Text demo
     BlueLight bold Text("The given button opens chrome in Linux")
     str a
     Red Button {

@@ -7,11 +7,11 @@
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/recursive_variant.hpp>
 
-#include "ftxui/component/component.hpp"      // for Input, Renderer, Vertical
-#include "ftxui/component/component_base.hpp" // for ComponentBase
-#include "ftxui/component/component_options.hpp" // for InputOption
-#include "ftxui/component/mouse.hpp"             // for ftxui
-#include "ftxui/component/screen_interactive.hpp"
+#include "ftxui/component/component.hpp"          // for Components
+#include "ftxui/component/component_base.hpp"     // for ComponentBase
+#include "ftxui/component/component_options.hpp"  // for Options
+#include "ftxui/component/mouse.hpp"              // for ftxui
+#include "ftxui/component/screen_interactive.hpp" // for screen
 #include "ftxui/dom/elements.hpp" // for text, hbox, separator, Element, operator|, vbox, border
 #include "ftxui/screen/screen.hpp"
 #include "ftxui/util/ref.hpp" // for Ref
@@ -665,9 +665,6 @@ struct node_printer : boost::static_visitor<> {
   }
 
   void operator()(quick_ftxui_ast::dom_text const &text) const {
-    // tab(indent + tabsize);
-    // std::cout << "nil: \"" << text << '"' << std::endl;
-
     switch (text.style) {
     case quick_ftxui_ast::text_style::none:
       data->components.push_back(ftxui::Renderer([&] {
@@ -742,8 +739,7 @@ struct node_printer : boost::static_visitor<> {
   }
 
   void operator()(quick_ftxui_ast::separator const &text) const {
-    // tab(indent + tabsize);
-    // std::cout << "nil: \"" << text << '"' << std::endl;
+
     // clang-format off
     switch (text.style) {
     case quick_ftxui_ast::sep_style::Normal:
@@ -974,9 +970,17 @@ struct parser
     para_comp %=
         -(color_kw) >> qi::lit("Paragraph") >> '(' >> quoted_string >> ')';
 
+    single_line_comment =
+        qi::lit("//") >> *(char_ - qi::eol) >> (qi::eol | qi::eoi);
+
+    multi_line_comment =
+        qi::lit("/*") >> *(multi_line_comment | char_ - "*/") > qi::lit("*/");
+
+    skipper = single_line_comment | multi_line_comment;
+
     node = button_comp | input_comp | slider_comp | menu_comp | toggle_comp |
            drpdwn_comp | text_comp | int_var_decl | str_var_decl | sep_comp |
-           para_comp | expression;
+           para_comp | skipper | expression;
 
     expression = -(border_kw) >> alignment_kw >> '{' >> *node >> '}';
 
@@ -1006,6 +1010,7 @@ struct parser
   qi::rule<Iterator, quick_ftxui_ast::dom_text(), ascii::space_type> text_comp;
   qi::rule<Iterator, quick_ftxui_ast::separator(), ascii::space_type> sep_comp;
   qi::rule<Iterator, quick_ftxui_ast::paragraph(), ascii::space_type> para_comp;
+  qi::rule<Iterator> single_line_comment, multi_line_comment, skipper;
   qi::symbols<char, quick_ftxui_ast::block_alignment> alignment_kw;
   qi::symbols<char, quick_ftxui_ast::button_option> buttonopt_kw;
   qi::symbols<char, quick_ftxui_ast::input_option> inputopt_kw;
@@ -1115,6 +1120,10 @@ void parse_qf(std::string source_code) {
     throw std::runtime_error("Parsing failed\n");
   }
 }
+
+///////////////////////////////////////////////////////////////////////////
+//  Variable interfacing
+///////////////////////////////////////////////////////////////////////////
 
 int get_int(std::string var_name) {
   if (auto It = quick_ftxui_ast::numbers.find(std::string(var_name));

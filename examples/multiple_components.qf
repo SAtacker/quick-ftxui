@@ -30,6 +30,8 @@ DoubleBorder Vertical{
         }
     }
 
+    // Separator here!!
+
     Dashed separator
 
     RedLight Button {
