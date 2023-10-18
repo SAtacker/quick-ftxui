@@ -1,0 +1,22 @@
+Vertical {
+    // Vertical radiobox
+    int x
+    int y
+    Red Radiobox {
+        ["Mechanical", "Chemistry", "Physics", "Electrical", ],
+        x
+    }
+    Heavy separator
+    Horizontal {
+        // In block
+        Text("Select your branch")
+        YellowLight Radiobox {
+            ["Mechanical", "Chemistry", "Physics", "Electrical", ],
+            y
+        }
+    }
+    Blue Button {
+        "Exit",
+        "Exit"
+    }
+}

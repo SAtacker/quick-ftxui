@@ -105,6 +105,16 @@ https://github.com/vrnimje/quick-ftxui/assets/103848930/715c821b-b259-4e2b-ab25-
 
     </details>
 
+    </details>
+
+    <details><summary>Radiobox</summary>
+
+    [Example](./examples/radiobox.qf#L5-8)
+
+    ![](./assets/image-13.png)
+
+    </details>
+
 * #### Supports FTXUI's basic DOM elements (more coming with future releases)
 
     <details><summary>Text</summary>
@@ -117,7 +127,7 @@ https://github.com/vrnimje/quick-ftxui/assets/103848930/715c821b-b259-4e2b-ab25-
 
     <details><summary>Paragraph</summary>
 
-    Similar to text, but adapts to size of terminal windoe
+    Similar to text, but adapts to size of terminal window
 
     [Example](./examples/paragraph.qf)
 
