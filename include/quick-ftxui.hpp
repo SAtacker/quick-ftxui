@@ -53,7 +53,7 @@ struct str_variable_decl;
 
 enum block_alignment { VERTICAL, HORIZONTAL };
 enum button_option { Ascii, Animated, Simple, NoOpt };
-enum input_option { None, Password };
+enum input_option { None, Password, Spacious };
 enum sep_style { Normal, Light, Dashed, Double, Heavy };
 enum borders {
   NoBorder,
@@ -573,18 +573,35 @@ struct node_printer : boost::static_visitor<> {
 
     if (auto It = quick_ftxui_ast::strings.find(std::string(text.value));
         It != quick_ftxui_ast::strings.end()) {
-      ftxui::InputOption pass;
+
+      ftxui::InputOption pass = ftxui::InputOption::Default();
       ftxui::Color input_clr = quick_ftxui_ast::resolveColour(text.color);
+
       pass.transform = [input_clr](ftxui::InputState state) {
         state.element |= ftxui::color(input_clr);
         if (state.is_placeholder) {
           state.element |= ftxui::dim;
         }
         if (state.is_placeholder && state.focused) {
-          state.element |= bgcolor(input_clr);
+          state.element |= ftxui::bgcolor(input_clr);
         }
         return state.element;
       };
+
+      ftxui::InputOption spacious = ftxui::InputOption::Spacious();
+
+      spacious.transform = [input_clr](ftxui::InputState state) {
+        state.element |= ftxui::borderEmpty;
+        state.element |= ftxui::color(input_clr);
+        if (state.is_placeholder) {
+          state.element |= ftxui::dim;
+        }
+        if (state.is_placeholder && state.focused) {
+          state.element |= ftxui::bgcolor(input_clr);
+        }
+        return state.element;
+      };
+
       switch (text.opt) {
       case quick_ftxui_ast::input_option::None:
         data->components.push_back(
@@ -595,6 +612,11 @@ struct node_printer : boost::static_visitor<> {
         pass.password = true;
         data->components.push_back(
             ftxui::Input(&It->second, text.placeholder, pass));
+        break;
+
+      case quick_ftxui_ast::input_option::Spacious:
+        data->components.push_back(
+            ftxui::Input(&It->second, text.placeholder, spacious));
         break;
       default:
         throw std::runtime_error("Should never reach here");
@@ -897,6 +919,7 @@ struct parser
           .add
           ("None", quick_ftxui_ast::input_option::None)
           ("Password", quick_ftxui_ast::input_option::Password)
+          ("Spacious", quick_ftxui_ast::input_option::Spacious)
           ;
         
         menuopt_kw

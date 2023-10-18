@@ -15,8 +15,9 @@ include(FetchContent)
 
 if(QUICK_FTXUI_FETCH_BOOST)
     FetchContent_Declare(Boost
-        URL https://github.com/boostorg/boost/releases/download/boost-1.81.0/boost-1.81.0.tar.gz
+        URL https://github.com/boostorg/boost/releases/download/boost-1.83.0/boost-1.83.0.tar.gz
         TLS_VERIFY true
+        DOWNLOAD_EXTRACT_TIMESTAMP true
     )
     FetchContent_Populate(Boost)
 

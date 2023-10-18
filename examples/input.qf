@@ -8,7 +8,7 @@ Vertical {
     }
     BlueLight Input {
         "Last Name....",
-        None,
+        Spacious,
         l
     }
     Red Input {
