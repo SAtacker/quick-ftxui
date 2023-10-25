@@ -48,6 +48,7 @@ struct menu;
 struct toggle;
 struct dropdown;
 struct radiobox;
+struct checkbox;
 struct int_variable_decl;
 struct str_variable_decl;
 
@@ -136,7 +137,7 @@ typedef boost::variant<
     boost::recursive_wrapper<toggle>, boost::recursive_wrapper<dropdown>,
     boost::recursive_wrapper<radiobox>, boost::recursive_wrapper<expression>,
     boost::recursive_wrapper<dom_text>, boost::recursive_wrapper<separator>,
-    boost::recursive_wrapper<paragraph>,
+    boost::recursive_wrapper<checkbox>, boost::recursive_wrapper<paragraph>,
     boost::recursive_wrapper<int_variable_decl>,
     boost::recursive_wrapper<str_variable_decl>>
     node;
@@ -188,6 +189,12 @@ struct radiobox {
   colours color = colours::Default;
   std::vector<std::string> entries;
   std::string selected;
+};
+
+struct checkbox {
+  colours color = colours::Default;
+  std::string label;
+  std::string checked;
 };
 
 struct dom_text {
@@ -309,6 +316,12 @@ BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::radiobox,
                           (quick_ftxui_ast::colours, color)
                           (std::vector <std::string> , entries)
                           (std::string, selected)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::checkbox,
+                          (quick_ftxui_ast::colours, color)
+                          (std::string , label)
+                          (std::string, checked)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::dom_text,
@@ -710,6 +723,22 @@ struct node_printer : boost::static_visitor<> {
     }
   }
 
+  void operator()(quick_ftxui_ast::checkbox const &text) const {
+    // tab(indent + tabsize);
+
+    ftxui::Color check_clr = quick_ftxui_ast::resolveColour(text.color);
+
+    if (auto It = quick_ftxui_ast::numbers.find(std::string(text.checked));
+        It != quick_ftxui_ast::numbers.end()) {
+      // bool* b = (bool*)(&It->second);
+      data->components.push_back(
+          ftxui::Checkbox(text.label, (bool *)(&It->second)) |
+          ftxui::color(check_clr));
+    } else {
+      throw std::runtime_error("Variable " + text.checked + " not found");
+    }
+  }
+
   void operator()(quick_ftxui_ast::nil const &text) const {
     // tab(indent + tabsize);
     // std::cout << "nil: \"" << text << '"' << std::endl;
@@ -1013,6 +1042,9 @@ struct parser
     radiobox_comp %= -(color_kw) >> qi::lit("Radiobox") >> '{' >> '[' >>
                      +(quoted_string >> ',') >> ']' >> ',' >> identifier >> '}';
 
+    checkbox_comp %= -(color_kw) >> qi::lit("Checkbox") >> '{' >>
+                     quoted_string >> ',' >> identifier >> '}';
+
     int_var_decl %= qi::lit("int") >> identifier >> -('=' > qi::int_);
 
     str_var_decl %= qi::lit("str") >> identifier >> -('=' > quoted_string);
@@ -1035,7 +1067,8 @@ struct parser
 
     node = button_comp | input_comp | slider_comp | menu_comp | toggle_comp |
            drpdwn_comp | radiobox_comp | text_comp | int_var_decl |
-           str_var_decl | sep_comp | para_comp | skipper | expression;
+           str_var_decl | sep_comp | para_comp | skipper | expression |
+           checkbox_comp;
 
     expression = -(border_kw) >> alignment_kw >> '{' >> *node >> '}';
 
@@ -1056,6 +1089,8 @@ struct parser
       drpdwn_comp;
   qi::rule<Iterator, quick_ftxui_ast::radiobox(), ascii::space_type>
       radiobox_comp;
+  qi::rule<Iterator, quick_ftxui_ast::checkbox(), ascii::space_type>
+      checkbox_comp;
   qi::rule<Iterator, std::string(), ascii::space_type> quoted_string;
   qi::rule<Iterator, std::string(), ascii::space_type> button_function;
   qi::rule<Iterator, quick_ftxui_ast::slider(), ascii::space_type> slider_comp;

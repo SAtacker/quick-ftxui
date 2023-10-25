@@ -15,6 +15,16 @@ Vertical {
             y
         }
     }
+    int z 
+    Blue Checkbox {
+        "Quick",
+        z
+    }
+    int w 
+    Green Checkbox {
+        "FTXUI",
+        w
+    }
     Blue Button {
         "Exit",
         "Exit"

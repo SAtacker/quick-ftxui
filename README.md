@@ -2,6 +2,11 @@
     <img src="./assets/qf-high-resolution-color-logo.png" height=150 width=200></img>
     <h1>Quick-FTXUI</h1>
     <h3>A <i>Quick</i> & Easy way to render terminal user interfaces, using FTXUI.</h3>
+    <img src="https://github.com/vrnimje/quick-ftxui/actions/workflows/linux_build.yml/badge.svg">
+    <img src="https://github.com/vrnimje/quick-ftxui/actions/workflows/linux_build_no_boost.yml/badge.svg">
+    <img src="https://github.com/vrnimje/quick-ftxui/actions/workflows/windows_build_no_boost.yml/badge.svg">
+    <img src="https://github.com/vrnimje/quick-ftxui/actions/workflows/windows_build.yml/badge.svg">
+    
 </div>
 
 ## Example
@@ -109,9 +114,17 @@ https://github.com/vrnimje/quick-ftxui/assets/103848930/715c821b-b259-4e2b-ab25-
 
     <details><summary>Radiobox</summary>
 
-    [Example](./examples/radiobox.qf#L5-8)
+    [Example](./examples/radio_check_box.qf#L5-8)
 
     ![](./assets/image-13.png)
+
+    </details>
+
+    <details><summary>Checkbox</summary>
+
+    [Example](./examples/radio_check_box.qf#L19-22)
+
+    ![](./assets/image-14.png)
 
     </details>
 
