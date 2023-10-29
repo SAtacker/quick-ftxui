@@ -7,7 +7,7 @@ on:
       - ".github/workflows/windows_build_no_boost.yml"
       - "include/**"
       - "src/**"
-      - "tests/**"
+      - "tests/**", win_rev_linux_fix
       - "CMakeLists.txt"
   pull_request:
     branches: [ master ]
@@ -25,11 +25,6 @@ jobs:
       CMAKE_PREFIX_PATH: ${{ github.workspace }}\.local
     steps:
     - uses: actions/checkout@v2
-
-    - name: Remove Strawberry Perl from PATH
-      run: |
-        $env:PATH = $env:PATH -replace "C:\\Strawberry\\c\\bin;", "" 
-        "PATH=$env:PATH" | Out-File -FilePath $env:GITHUB_ENV -Append
 
     - name: Configure CMake
       run: cmake -S . -B build "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake" -DQUICK_FTXUI_FETCH_BOOST=ON

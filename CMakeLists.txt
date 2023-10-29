@@ -57,7 +57,7 @@ if(QUICK_FTXUI_TESTS)
     FetchContent_Declare(
         Catch2
         GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-        GIT_TAG v3.0.1 # or a later release
+        GIT_TAG v3.4.0 # or a later release
     )
 
     FetchContent_MakeAvailable(Catch2)
