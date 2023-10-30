@@ -1,13 +1,13 @@
 Vertical {
-    Border Vertical {
+    Red Border Vertical {
         Text("This is normal border")
     }
 
-    LightBorder Vertical {
+    Magenta LightBorder Vertical {
         Text("This is light border")
     }
 
-    HeavyBorder Vertical {
+    Blue HeavyBorder Vertical {
         Text("This is heavy border")
     }
 

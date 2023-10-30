@@ -205,6 +205,7 @@ struct dom_text {
 };
 
 struct separator {
+  colours color = colours::Default;
   sep_style style = sep_style::Normal;
 };
 
@@ -224,6 +225,7 @@ struct str_variable_decl {
 };
 
 struct expression {
+  colours border_color = colours::Default;
   borders border_opt = borders::NoBorder;
   block_alignment align;
   std::list<node> expr;
@@ -332,6 +334,7 @@ BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::dom_text,
 )
 
 BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::separator,
+                          (quick_ftxui_ast::colours, color)
                           (quick_ftxui_ast::sep_style, style)
 )
 
@@ -351,6 +354,7 @@ BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::str_variable_decl,
 )
 
 BOOST_FUSION_ADAPT_STRUCT(quick_ftxui_ast::expression,
+                          (quick_ftxui_ast::colours, border_color)
                           (quick_ftxui_ast::borders, border_opt)
                           (quick_ftxui_ast::block_alignment, align)
                           (std::list<quick_ftxui_ast::node>, expr)
@@ -414,33 +418,40 @@ struct node_printer : boost::static_visitor<> {
       break;
     }
 
+    ftxui::Color border_clr = quick_ftxui_ast::resolveColour(expr.border_color);
+
     switch (expr.border_opt) {
     case quick_ftxui_ast::borders::NoBorder:
       data->components.push_back(nest_comp);
       break;
 
     case quick_ftxui_ast::borders::NormalBorder:
-      data->components.push_back(nest_comp | ftxui::border);
+      data->components.push_back(nest_comp | ftxui::borderStyled(border_clr));
       break;
 
     case quick_ftxui_ast::borders::LightBorder:
-      data->components.push_back(nest_comp | ftxui::borderLight);
+      data->components.push_back(nest_comp |
+                                 ftxui::borderStyled(ftxui::LIGHT, border_clr));
       break;
 
     case quick_ftxui_ast::borders::DashedBorder:
-      data->components.push_back(nest_comp | ftxui::borderDashed);
+      data->components.push_back(
+          nest_comp | ftxui::borderStyled(ftxui::DASHED, border_clr));
       break;
 
     case quick_ftxui_ast::borders::HeavyBorder:
-      data->components.push_back(nest_comp | ftxui::borderHeavy);
+      data->components.push_back(nest_comp |
+                                 ftxui::borderStyled(ftxui::HEAVY, border_clr));
       break;
 
     case quick_ftxui_ast::borders::DoubleBorder:
-      data->components.push_back(nest_comp | ftxui::borderDouble);
+      data->components.push_back(
+          nest_comp | ftxui::borderStyled(ftxui::DOUBLE, border_clr));
       break;
 
     case quick_ftxui_ast::borders::RoundedBorder:
-      data->components.push_back(nest_comp | ftxui::borderRounded);
+      data->components.push_back(
+          nest_comp | ftxui::borderStyled(ftxui::ROUNDED, border_clr));
       break;
     default:
       throw std::runtime_error("Border options should not reach here");
@@ -824,24 +835,24 @@ struct node_printer : boost::static_visitor<> {
     switch (text.style) {
     case quick_ftxui_ast::sep_style::Normal:
       data->components.push_back(
-          ftxui::Renderer([&] {   return ftxui::separator(); }));
+          ftxui::Renderer([&] {   return ftxui::separator() | ftxui::color(quick_ftxui_ast::resolveColour(text.color)); }));
       break;
 
     case quick_ftxui_ast::sep_style::Light:
       data->components.push_back(
-          ftxui::Renderer([&] {   return ftxui::separatorLight(); }));
+          ftxui::Renderer([&] {   return ftxui::separatorLight() | ftxui::color(quick_ftxui_ast::resolveColour(text.color)); }));
       break;
     case quick_ftxui_ast::sep_style::Dashed:
       data->components.push_back(
-          ftxui::Renderer([&] {   return ftxui::separatorDashed(); }));
+          ftxui::Renderer([&] {   return ftxui::separatorDashed() | ftxui::color(quick_ftxui_ast::resolveColour(text.color)); }));
       break;
     case quick_ftxui_ast::sep_style::Double:
       data->components.push_back(
-          ftxui::Renderer([&] {   return ftxui::separatorDouble(); }));
+          ftxui::Renderer([&] {   return ftxui::separatorDouble() | ftxui::color(quick_ftxui_ast::resolveColour(text.color)); }));
       break;
     case quick_ftxui_ast::sep_style::Heavy:
       data->components.push_back(
-          ftxui::Renderer([&] {   return ftxui::separatorHeavy(); }));
+          ftxui::Renderer([&] {   return ftxui::separatorHeavy() | ftxui::color(quick_ftxui_ast::resolveColour(text.color)); }));
       break;
     default:
       throw std::runtime_error("Should not reach here");
@@ -1052,7 +1063,7 @@ struct parser
     text_comp %= -(color_kw) >> -(text_style_kw) >> qi::lit("Text") >> '(' >>
                  quoted_string >> -(',' >> quoted_string) >> ')';
 
-    sep_comp %= -(sep_kw) >> qi::lit("separator");
+    sep_comp %= -(color_kw) >> -(sep_kw) >> qi::lit("separator");
 
     para_comp %=
         -(color_kw) >> qi::lit("Paragraph") >> '(' >> quoted_string >> ')';
@@ -1070,7 +1081,8 @@ struct parser
            str_var_decl | sep_comp | para_comp | skipper | expression |
            checkbox_comp;
 
-    expression = -(border_kw) >> alignment_kw >> '{' >> *node >> '}';
+    expression =
+        -(color_kw) >> -(border_kw) >> alignment_kw >> '{' >> *node >> '}';
 
     // Debugging and error handling and reporting support.
     BOOST_SPIRIT_DEBUG_NODES((expression));
