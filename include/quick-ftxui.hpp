@@ -101,7 +101,9 @@ enum colours {
   Red,
   RedLight,
   Yellow,
-  YellowLight
+  YellowLight,  
+  LightGreen, 
+  DarkCyan
 };
 
 std::map<colours, ftxui::Color> colour_map = {
@@ -121,11 +123,25 @@ std::map<colours, ftxui::Color> colour_map = {
     {colours::Red, ftxui::Color::Red},
     {colours::RedLight, ftxui::Color::RedLight},
     {colours::Yellow, ftxui::Color::Yellow},
-    {colours::YellowLight, ftxui::Color::YellowLight},
+    {colours::YellowLight, ftxui::Color::YellowLight}
+};
+
+std::map<colours,ftxui::Color::Palette256>colour_map256={
+    {colours::LightGreen,ftxui::Color::Palette256::LightGreen}, 
+    {colours::DarkCyan,ftxui::Color::Palette256::DarkCyan}
 };
 
 ftxui::Color resolveColour(colours Name) {
-  if (auto It = colour_map.find(Name); It != colour_map.end()) {
+  if (auto It = colour_map.find(Name); It != colour_map.end()) { 
+    //std::cout<<"colour not found!!!" << It<<std::endl;
+    return It->second;
+  }
+  return ftxui::Color::Default;
+} 
+
+ftxui::Color::Palette256 resolveColour256(colours Name) {
+  if (auto It = colour_map256.find(Name); It != colour_map256.end()) { 
+    //std::cout<<"colour not found!!!" << It<<std::endl;
     return It->second;
   }
   return ftxui::Color::Default;
@@ -939,7 +955,7 @@ struct parser
     qi::_4_type _4;
 
     using qi::fail;
-    using qi::on_error;
+    using qi::on_error; 
 
     // clang-format off
         alignment_kw
@@ -988,7 +1004,8 @@ struct parser
           ("Red", quick_ftxui_ast::colours::Red)
           ("RedLight", quick_ftxui_ast::colours::RedLight)
           ("Yellow", quick_ftxui_ast::colours::Yellow)
-          ("YellowLight", quick_ftxui_ast::colours::YellowLight)
+          ("YellowLight", quick_ftxui_ast::colours::YellowLight) 
+          ("DarkCyan",quick_ftxui_ast::colours::DarkCyan)
           ;
         sep_kw
           .add
